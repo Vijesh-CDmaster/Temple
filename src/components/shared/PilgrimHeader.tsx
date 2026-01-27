@@ -10,6 +10,7 @@ import { TempleIcon, UserIcon } from "./icons";
 
 const navLinks = [
   { href: "/dashboard", label: "Home" },
+  { href: "/dashboard/live-status", label: "Live Status" },
   { href: "/dashboard/temples", label: "Temples" },
   { href: "/dashboard/maps", label: "Maps" },
   { href: "/dashboard/virtual-queue", label: "Virtual Queue" },
