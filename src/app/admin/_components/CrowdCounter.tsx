@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCrowdCount } from "@/app/actions/countCrowd";
 import type { State as ResultState } from "@/app/actions/countCrowd";
@@ -21,6 +21,7 @@ export function CrowdCounter() {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [resultState, setResultState] = useState<ResultState>(initialState);
+  const [analysisTriggered, setAnalysisTriggered] = useState(false);
 
   const startCamera = async () => {
     setCameraError(null);
@@ -41,18 +42,8 @@ export function CrowdCounter() {
     }
   };
 
-  useEffect(() => {
-    startCamera();
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleAnalyze = async () => {
-    if (videoRef.current && canvasRef.current) {
+    if (videoRef.current && canvasRef.current && !isPending) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       canvas.width = video.videoWidth;
@@ -74,31 +65,56 @@ export function CrowdCounter() {
     }
   };
 
+  useEffect(() => {
+    startCamera();
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isCameraOn && !analysisTriggered) {
+      setAnalysisTriggered(true);
+      // Wait for the camera to stabilize
+      setTimeout(() => {
+        handleAnalyze();
+      }, 1500);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCameraOn, analysisTriggered]);
+
+
   return (
     <div className="grid gap-8 lg:grid-cols-5">
       <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2"><Camera className="text-primary"/> Live Crowd Analysis</CardTitle>
-          <CardDescription>Use your device's camera to get a real-time crowd count and risk assessment.</CardDescription>
+          <CardDescription>Using your device's camera to get a real-time crowd count and risk assessment.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative aspect-video w-full bg-muted rounded-md overflow-hidden flex items-center justify-center">
             <video ref={videoRef} autoPlay playsInline muted className={cn("w-full h-full object-cover", { 'hidden': !isCameraOn })}></video>
-            {!isCameraOn && (
+            
+            {isPending && (
+                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-10">
+                    <Loader2 className="w-10 h-10 animate-spin mb-4" />
+                    <p className="text-lg font-semibold">Analyzing crowd...</p>
+                    <p className="text-sm">This may take a moment.</p>
+                </div>
+            )}
+
+            {!isCameraOn && !isPending && (
                 <div className="flex flex-col items-center text-center text-muted-foreground p-4">
                     <VideoOff className="w-12 h-12 mb-2"/>
-                    <p className="text-sm font-medium">{cameraError || "Camera is off"}</p>
+                    <p className="text-sm font-medium">{cameraError || "Initializing Camera..."}</p>
                     {cameraError && <Button onClick={startCamera} variant="outline" className="mt-4">Try Again</Button>}
                 </div>
             )}
           </div>
         </CardContent>
-        <CardFooter>
-            <Button onClick={handleAnalyze} disabled={isPending || !isCameraOn} className="w-full">
-              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
-              Analyze Crowd from Camera
-            </Button>
-        </CardFooter>
       </Card>
 
       <div className="lg:col-span-2">
@@ -106,9 +122,19 @@ export function CrowdCounter() {
           <AnalysisResults data={resultState.data} />
         ) : (
           <Card className="flex h-full min-h-[400px] flex-col items-center justify-center text-center p-8">
-            <Users className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold text-muted-foreground">Analysis will appear here</h3>
-            <p className="text-sm text-muted-foreground mt-2">Point your camera at a crowd and click "Analyze" to begin.</p>
+            {isPending ? (
+                 <>
+                    <Loader2 className="h-16 w-16 text-muted-foreground animate-spin mb-4" />
+                    <h3 className="text-xl font-semibold text-muted-foreground">Analysis in Progress</h3>
+                    <p className="text-sm text-muted-foreground mt-2">Please wait while we analyze the camera feed.</p>
+                 </>
+            ) : (
+                <>
+                    <Users className="h-16 w-16 text-muted-foreground mb-4" />
+                    <h3 className="text-xl font-semibold text-muted-foreground">Analysis will appear here</h3>
+                    <p className="text-sm text-muted-foreground mt-2">The crowd analysis will start automatically.</p>
+                </>
+            )}
           </Card>
         )}
         {resultState.message && resultState.message !== 'Analysis successful.' && <p className="text-sm font-medium text-destructive mt-2">{resultState.message}</p>}
@@ -128,7 +154,7 @@ function AnalysisResults({ data }: { data: CountCrowdOutput }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><Users className="text-primary"/> Crowd Analysis</CardTitle>
+                <CardTitle className="font-headline flex items-center gap-2"><Users className="text-primary"/> Crowd Analysis Results</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="text-center">
