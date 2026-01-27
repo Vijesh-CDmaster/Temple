@@ -5,7 +5,8 @@ import {
     CardTitle,
   } from "@/components/ui/card";
   import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-  import { Users, Clock, Building, Siren } from "lucide-react";
+  import { Clock, Building, Siren } from "lucide-react";
+  import { CrowdCounter } from "./_components/CrowdCounter";
   
   export default function LiveStatusPage() {
     return (
@@ -13,6 +14,10 @@ import {
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-headline">Live Status</h1>
           <p className="text-muted-foreground">Real-time updates for your pilgrimage</p>
+        </div>
+        
+        <div className="mb-8">
+            <CrowdCounter />
         </div>
   
         <Alert className="mb-8 border-primary/50 bg-primary/10">
@@ -23,14 +28,7 @@ import {
           </AlertDescription>
         </Alert>
   
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          <InfoCard
-            title="Live Crowd Status"
-            value="High"
-            description="Density at main complex"
-            icon={<Users className="w-6 h-6 text-destructive" />}
-            colorClass="text-destructive"
-          />
+        <div className="grid gap-6 md:grid-cols-2">
           <InfoCard
             title="Estimated Waiting Time"
             value="~45 mins"
