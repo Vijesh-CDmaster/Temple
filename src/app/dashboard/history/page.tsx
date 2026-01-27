@@ -2,12 +2,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
-
-const visitHistory = [
-    { id: 1, temple: "Somnath Temple", date: "2024-05-12", status: "Completed" },
-    { id: 2, temple: "Dwarkadhish Temple", date: "2024-03-20", status: "Completed" },
-    { id: 3, temple: "Ambaji Temple", date: "2023-11-05", status: "Completed" },
-]
+import { visitHistory } from "@/lib/app-data";
 
 export default function HistoryPage() {
     return (

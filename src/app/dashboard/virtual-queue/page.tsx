@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Users } from "lucide-react";
+import { temples } from "@/lib/app-data";
 
 const formSchema = z.object({
   temple: z.string().min(1, "Please select a temple."),
@@ -77,9 +78,11 @@ export default function VirtualQueuePage() {
                                         </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                        <SelectItem value="Somnath Temple">Somnath Temple</SelectItem>
-                                        <SelectItem value="Dwarkadhish Temple">Dwarkadhish Temple</SelectItem>
-                                        <SelectItem value="Ambaji Temple">Ambaji Temple</SelectItem>
+                                            {temples.map((temple) => (
+                                                <SelectItem key={temple.id} value={temple.name}>
+                                                    {temple.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

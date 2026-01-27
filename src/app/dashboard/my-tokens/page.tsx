@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { Ticket, Clock, Calendar, Users, QrCode } from "lucide-react";
+import { activeToken } from "@/lib/app-data";
 
 export default function MyTokensPage() {
     const qrImage = PlaceHolderImages.find(p => p.id === "qr-code");
@@ -24,7 +25,7 @@ export default function MyTokensPage() {
             
             <Card className="max-w-md mx-auto">
                 <CardHeader className="text-center bg-primary/10">
-                    <CardTitle className="font-headline text-2xl">Somnath Temple</CardTitle>
+                    <CardTitle className="font-headline text-2xl">{activeToken.temple}</CardTitle>
                     <CardDescription>Your Virtual Darshan Pass</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -42,14 +43,14 @@ export default function MyTokensPage() {
                         )}
                     </div>
                     <div className="space-y-4 text-sm">
-                        <InfoRow icon={<Calendar className="w-4 h-4 text-muted-foreground" />} label="Date" value="2024-10-28" />
-                        <InfoRow icon={<Clock className="w-4 h-4 text-muted-foreground" />} label="Time Slot" value="02:00 - 03:00 PM" />
-                        <InfoRow icon={<Users className="w-4 h-4 text-muted-foreground" />} label="Pilgrims" value="2 Adults" />
-                        <InfoRow icon={<QrCode className="w-4 h-4 text-muted-foreground" />} label="Token ID" value="TCN-SMN-8A3D5F" />
+                        <InfoRow icon={<Calendar className="w-4 h-4 text-muted-foreground" />} label="Date" value={activeToken.date} />
+                        <InfoRow icon={<Clock className="w-4 h-4 text-muted-foreground" />} label="Time Slot" value={activeToken.timeSlot} />
+                        <InfoRow icon={<Users className="w-4 h-4 text-muted-foreground" />} label="Pilgrims" value={activeToken.pilgrims} />
+                        <InfoRow icon={<QrCode className="w-4 h-4 text-muted-foreground" />} label="Token ID" value={activeToken.tokenId} />
                     </div>
                 </CardContent>
                 <CardFooter className="bg-secondary/50 p-4 text-center text-sm text-muted-foreground">
-                    Show this QR code at Gate 3 for entry.
+                    Show this QR code at {activeToken.gate} for entry.
                 </CardFooter>
             </Card>
         </div>

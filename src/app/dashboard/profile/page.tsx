@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { userProfile } from "@/lib/app-data";
 
 export default function ProfilePage() {
     return (
@@ -14,25 +15,25 @@ export default function ProfilePage() {
             <Card className="max-w-2xl mx-auto">
                 <CardHeader className="items-center text-center">
                     <Avatar className="w-24 h-24 mb-4">
-                        <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
-                        <AvatarFallback>PD</AvatarFallback>
+                        <AvatarImage src={userProfile.avatar} alt="User Avatar" />
+                        <AvatarFallback>{userProfile.avatarFallback}</AvatarFallback>
                     </Avatar>
-                    <CardTitle className="font-headline text-2xl">Pilgrim Devotee</CardTitle>
-                    <CardDescription>pilgrim.devotee@example.com</CardDescription>
+                    <CardTitle className="font-headline text-2xl">{userProfile.name}</CardTitle>
+                    <CardDescription>{userProfile.email}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" defaultValue="Pilgrim Devotee" />
+                            <Input id="name" defaultValue={userProfile.name} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" defaultValue="+91 98765 43210" />
+                            <Input id="phone" defaultValue={userProfile.phone} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="language">Language</Label>
-                            <Input id="language" defaultValue="English" />
+                            <Input id="language" defaultValue={userProfile.language} />
                         </div>
                          <div className="flex justify-end">
                             <Button type="submit">Save Changes</Button>

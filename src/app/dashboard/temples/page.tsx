@@ -5,13 +5,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
-const temples = [
-    { id: "1", name: "Somnath Temple", location: "Gujarat, India", crowd: "Medium", imageId: "temple-1" },
-    { id: "2", name: "Dwarkadhish Temple", location: "Gujarat, India", crowd: "Low", imageId: "temple-2" },
-    { id: "3", name: "Ambaji Temple", location: "Gujarat, India", crowd: "High", imageId: "temple-3" },
-    { id: "4", name: "Pavagadh Temple", location: "Gujarat, India", crowd: "Medium", imageId: "temple-4" },
-]
+import { temples } from "@/lib/app-data";
 
 const crowdVariant: { [key: string]: "default" | "secondary" | "destructive" } = {
     "Low": "secondary",

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Footprints, AlertTriangle, Siren } from "lucide-react";
+import { adminStats } from "@/lib/app-data";
 
 export default function AdminDashboardPage() {
     return (
@@ -10,10 +11,10 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                <StatCard title="Live Footfall" value="12,483" icon={<Footprints className="text-primary"/>} />
-                <StatCard title="Active Staff" value="215" icon={<Users className="text-primary"/>} />
-                <StatCard title="Active Alerts" value="3" icon={<AlertTriangle className="text-destructive"/>} />
-                <StatCard title="SOS Requests" value="1" icon={<Siren className="text-destructive"/>} />
+                <StatCard title="Live Footfall" value={adminStats.liveFootfall} icon={<Footprints className="text-primary"/>} />
+                <StatCard title="Active Staff" value={adminStats.activeStaff} icon={<Users className="text-primary"/>} />
+                <StatCard title="Active Alerts" value={adminStats.activeAlerts} icon={<AlertTriangle className="text-destructive"/>} />
+                <StatCard title="SOS Requests" value={adminStats.sosRequests} icon={<Siren className="text-destructive"/>} />
             </div>
         </>
     );

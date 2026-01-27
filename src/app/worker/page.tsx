@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Siren, ListChecks, Users, MapPin, CheckCircle } from "lucide-react";
+import { workerTasks, workerZone } from "@/lib/app-data";
 
 export default function WorkerDashboardPage() {
     return (
@@ -26,21 +27,21 @@ export default function WorkerDashboardPage() {
                         <CardTitle className="font-headline flex items-center gap-2"><ListChecks /> Priority Tasks</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <TaskItem title="Clear congestion at Gate 3" priority="High" />
-                        <TaskItem title="Verify QR tokens at Priority Lane" priority="Medium" />
-                        <TaskItem title="Patrol South Corridor" priority="Low" />
+                        {workerTasks.map((task) => (
+                            <TaskItem key={task.id} title={task.title} priority={task.priority as "High" | "Medium" | "Low"} />
+                        ))}
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader>
                         <CardTitle className="font-headline flex items-center gap-2"><Users /> Zone Monitoring</CardTitle>
-                        <CardDescription>Your assigned area: <span className="font-semibold text-primary">North Complex</span></CardDescription>
+                        <CardDescription>Your assigned area: <span className="font-semibold text-primary">{workerZone.name}</span></CardDescription>
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">Live Crowd Density:</p>
-                        <div className="text-2xl font-bold text-amber-600">Medium</div>
-                        <p className="text-xs text-muted-foreground">Pilgrim flow is steady.</p>
+                        <div className="text-2xl font-bold text-amber-600">{workerZone.crowdDensity}</div>
+                        <p className="text-xs text-muted-foreground">{workerZone.pilgrimFlow}</p>
                     </CardContent>
                     <CardFooter>
                         <Button variant="outline" className="w-full">View Zone Map</Button>
