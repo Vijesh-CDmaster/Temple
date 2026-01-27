@@ -1,4 +1,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/predict-crowd-surges.ts';
+import '@/ai/flows/count-crowd-flow.ts';

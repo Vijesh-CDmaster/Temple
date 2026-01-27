@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Footprints, AlertTriangle, Siren } from "lucide-react";
-import { AiPrediction } from "./_components/AiPrediction";
+import { CrowdCounter } from "./_components/CrowdCounter";
 
 export default function AdminDashboardPage() {
     return (
@@ -17,7 +17,7 @@ export default function AdminDashboardPage() {
                 <StatCard title="SOS Requests" value="1" icon={<Siren className="text-destructive"/>} />
             </div>
 
-            <AiPrediction />
+            <CrowdCounter />
         </>
     );
 }
