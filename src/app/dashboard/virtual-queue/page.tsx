@@ -1,6 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useFieldArray, useWatch, Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -22,56 +23,184 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, Users } from "lucide-react";
+import { Users, Trash2 } from "lucide-react";
 import { temples, timeSlots } from "@/lib/app-data";
 import { useToken } from "@/context/TokenContext";
 import { useRouter } from "next/navigation";
+
+const pilgrimSchema = z.object({
+    name: z.string().min(1, "Name is required."),
+    age: z.coerce.number().min(1, "Age must be at least 1.").max(120, "Age seems unlikely."),
+    phone: z.string().optional(),
+    isDifferentlyAbled: z.boolean().default(false),
+    photo: z.any().optional(),
+});
 
 const formSchema = z.object({
   temple: z.string().min(1, "Please select a temple."),
   date: z.string().min(1, "Please select a date."),
   timeSlot: z.string().min(1, "Please select a time slot."),
   numberOfPilgrims: z.coerce.number().min(1, "At least one pilgrim required.").max(10, "Maximum of 10 pilgrims allowed."),
-  priority: z.enum(["general", "senior", "disabled"]).default("general"),
+  pilgrims: z.array(pilgrimSchema),
 });
 
-const defaultValues = {
+type FormValues = z.infer<typeof formSchema>;
+
+const defaultValues: FormValues = {
     temple: "",
     date: "",
     timeSlot: "",
     numberOfPilgrims: 1,
-    priority: "general" as const,
+    pilgrims: [{ name: "", age: 0, phone: "", isDifferentlyAbled: false }],
 };
+
+
+function PilgrimFields({ control, index, remove }: { control: Control<FormValues>, index: number, remove: (index: number) => void }) {
+    const age = useWatch({
+        control,
+        name: `pilgrims.${index}.age`,
+    });
+
+    const isPhoneNumberDisabled = age < 18;
+
+    return (
+        <div className="border p-4 rounded-lg space-y-4 relative">
+             <h4 className="font-semibold text-primary">Pilgrim {index + 1}</h4>
+             {index > 0 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => remove(index)}><Trash2 className="w-4 h-4 text-destructive"/></Button>}
+            <FormField
+                control={control}
+                name={`pilgrims.${index}.name`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Enter pilgrim's name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                    control={control}
+                    name={`pilgrims.${index}.age`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Age</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder="e.g., 35" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name={`pilgrims.${index}.phone`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Optional for minors" {...field} disabled={isPhoneNumberDisabled} />
+                            </FormControl>
+                            {isPhoneNumberDisabled && <FormDescription className="text-xs">Phone number is not required for minors.</FormDescription>}
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-center">
+                 <FormField
+                    control={control}
+                    name={`pilgrims.${index}.photo`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Photo</FormLabel>
+                            <FormControl>
+                                <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={control}
+                    name={`pilgrims.${index}.isDifferentlyAbled`}
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 h-16 justify-center">
+                            <FormControl>
+                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel>Differently Abled?</FormLabel>
+                                <FormDescription className="text-xs">Check for priority access.</FormDescription>
+                            </div>
+                        </FormItem>
+                    )}
+                />
+            </div>
+        </div>
+    )
+}
 
 export default function VirtualQueuePage() {
     const { toast } = useToast();
     const router = useRouter();
-    const { setActiveToken } = useToken();
-    const form = useForm<z.infer<typeof formSchema>>({
+    const { setActiveTokens } = useToken();
+    const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues,
+        mode: "onChange",
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        const templeAbbreviation = values.temple.substring(0, 3).toUpperCase();
-        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-        
-        const newActiveToken = {
-            temple: values.temple,
-            date: values.date,
-            timeSlot: values.timeSlot,
-            pilgrims: `${values.numberOfPilgrims} ${values.numberOfPilgrims > 1 ? 'Pilgrims' : 'Pilgrim'}`,
-            tokenId: `TCN-${templeAbbreviation}-${randomString}`,
-            gate: "Gate 3"
-        }
+    const { control, watch, setValue } = form;
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "pilgrims",
+    });
 
-        setActiveToken(newActiveToken);
+    const numberOfPilgrims = watch("numberOfPilgrims");
+
+    useEffect(() => {
+        const currentCount = fields.length;
+        if (numberOfPilgrims > currentCount) {
+            for (let i = 0; i < numberOfPilgrims - currentCount; i++) {
+                append({ name: "", age: 0, phone: "", isDifferentlyAbled: false });
+            }
+        } else if (numberOfPilgrims < currentCount) {
+            const indicesToRemove = Array.from({ length: currentCount - numberOfPilgrims }, (_, i) => currentCount - 1 - i);
+            remove(indicesToRemove);
+        }
+    }, [numberOfPilgrims, fields.length, append, remove]);
+
+
+    function onSubmit(values: FormValues) {
+        const templeAbbreviation = values.temple.substring(0, 3).toUpperCase();
+        
+        const newTokens = values.pilgrims.map(pilgrim => {
+             const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+             return {
+                temple: values.temple,
+                date: values.date,
+                timeSlot: values.timeSlot,
+                pilgrim: {
+                    name: pilgrim.name,
+                    age: pilgrim.age,
+                    phone: pilgrim.phone || 'N/A',
+                    isDifferentlyAbled: pilgrim.isDifferentlyAbled
+                },
+                tokenId: `TCN-${templeAbbreviation}-${randomString}`,
+                gate: pilgrim.isDifferentlyAbled ? "Gate 1 (Priority)" : "Gate 3"
+             }
+        })
+
+        setActiveTokens(newTokens);
         
         toast({
             title: "✅ Booking Successful!",
-            description: `Your virtual queue token for ${values.temple} has been generated.`,
+            description: `Generated ${newTokens.length} virtual queue token(s) for ${values.temple}.`,
         });
         
         router.push('/dashboard/my-tokens');
@@ -79,7 +208,7 @@ export default function VirtualQueuePage() {
 
   return (
     <div className="container py-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-3xl">Book Virtual Queue</CardTitle>
@@ -89,7 +218,7 @@ export default function VirtualQueuePage() {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField
-                            control={form.control}
+                            control={control}
                             name="temple"
                             render={({ field }) => (
                                 <FormItem>
@@ -114,20 +243,20 @@ export default function VirtualQueuePage() {
                         />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <FormField
-                                control={form.control}
+                                control={control}
                                 name="date"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Date</FormLabel>
                                         <FormControl>
-                                            <Input type="date" {...field} />
+                                            <Input type="date" {...field} min={new Date().toISOString().split("T")[0]} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                              <FormField
-                                control={form.control}
+                                control={control}
                                 name="timeSlot"
                                 render={({ field }) => (
                                     <FormItem>
@@ -152,7 +281,7 @@ export default function VirtualQueuePage() {
                             />
                         </div>
                         <FormField
-                            control={form.control}
+                            control={control}
                             name="numberOfPilgrims"
                             render={({ field }) => (
                                 <FormItem>
@@ -160,56 +289,24 @@ export default function VirtualQueuePage() {
                                 <FormControl>
                                     <div className="relative">
                                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input type="number" placeholder="e.g., 2" {...field} />
+                                        <Input type="number" min="1" max="10" placeholder="e.g., 2" {...field} />
                                     </div>
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="priority"
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                <FormLabel>Priority Booking (if applicable)</FormLabel>
-                                <FormControl>
-                                    <RadioGroup
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8"
-                                    >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                        <RadioGroupItem value="general" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                        General Queue
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                        <RadioGroupItem value="senior" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                        Senior Citizen
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                        <RadioGroupItem value="disabled" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                        Differently Abled
-                                        </FormLabel>
-                                    </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" size="lg">Book My Slot</Button>
+
+                        <div className="space-y-6">
+                            {fields.map((field, index) => (
+                                <PilgrimFields key={field.id} control={control} index={index} remove={() => {
+                                    remove(index)
+                                    setValue('numberOfPilgrims', numberOfPilgrims - 1)
+                                }} />
+                            ))}
+                        </div>
+                       
+                        <Button type="submit" className="w-full" size="lg" disabled={!form.formState.isValid}>Book My Slot</Button>
                     </form>
                 </Form>
             </CardContent>
