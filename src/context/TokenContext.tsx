@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 export type Pilgrim = {
     name: string;
@@ -27,6 +27,27 @@ const TokenContext = createContext<TokenContextType | undefined>(undefined);
 
 export function TokenProvider({ children }: { children: ReactNode }) {
   const [activeTokens, setActiveTokens] = useState<Token[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load from localStorage on initial client-side render
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem('activeTokens');
+      if (item) {
+        setActiveTokens(JSON.parse(item));
+      }
+    } catch (error) {
+      console.error("Error reading from localStorage", error);
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save to localStorage when tokens change, but only after initialization
+  useEffect(() => {
+    if (isInitialized) {
+      window.localStorage.setItem('activeTokens', JSON.stringify(activeTokens));
+    }
+  }, [activeTokens, isInitialized]);
 
   return (
     <TokenContext.Provider value={{ activeTokens, setActiveTokens }}>
