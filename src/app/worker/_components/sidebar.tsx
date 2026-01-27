@@ -29,7 +29,7 @@ export function WorkerSidebar() {
         <nav className="flex-1 overflow-auto py-4">
             <ul className="space-y-1 px-2 lg:px-4">
             {navLinks.map((link) => (
-                <li key={link.href}>
+                <li key={link.label}>
                 <Link
                     href={link.href}
                     className={cn(
