@@ -37,18 +37,6 @@ export const adminStats = {
     sosRequests: "1",
 };
 
-export const workerTasks = [
-    { id: 1, title: "Clear congestion at Gate 3", priority: "High" },
-    { id: 2, title: "Verify QR tokens at Priority Lane", priority: "Medium" },
-    { id: 3, title: "Patrol South Corridor", priority: "Low" },
-];
-
-export const workerZone = {
-    name: "North Complex",
-    crowdDensity: "Medium",
-    pilgrimFlow: "Pilgrim flow is steady."
-};
-
 export const timeSlots = [
     { value: "10:00 - 11:00 AM", label: "10:00 - 11:00 AM" },
     { value: "11:00 - 12:00 PM", label: "11:00 - 12:00 PM" },
@@ -69,9 +57,4 @@ export const liveStatus = {
 export const liveAlert = {
     title: "Live Alert",
     description: "High crowd density expected near Gate 3 between 4 PM - 6 PM. Please use alternate routes."
-};
-
-export const workerAlert = {
-    title: "High Priority Alert: SOS Received!",
-    description: "Pilgrim in distress near West Gate. Medical assistance required."
 };

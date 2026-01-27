@@ -6,7 +6,7 @@ import {
   } from "@/components/ui/card";
   import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
   import { Clock, Building, Siren } from "lucide-react";
-  import { CrowdCounter } from "./_components/CrowdCounter";
+  import { CrowdCounter } from "@/components/shared/CrowdCounter";
   import { liveStatus, liveAlert } from "@/lib/app-data";
   
   export default function LiveStatusPage() {
