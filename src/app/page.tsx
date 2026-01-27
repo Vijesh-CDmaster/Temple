@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Shield, Briefcase } from "lucide-react";
+import { User, MoreVertical } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { TempleIcon } from "@/components/shared/icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Home() {
   const templeImage = PlaceHolderImages.find(p => p.id === 'temple-exterior');
@@ -35,25 +41,15 @@ export default function Home() {
         </p>
       </div>
       
-      <div className="z-10 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl w-full">
-        <RoleCard
-          role="Pilgrim"
-          description="Access live crowd info, book virtual queues, and navigate the temple grounds with ease."
-          icon={<User className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />}
-          href="/dashboard"
-        />
-        <RoleCard
-          role="Worker"
-          description="Manage on-ground tasks, respond to incidents, and coordinate with the team for smooth operations."
-          icon={<Briefcase className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />}
-          href="/worker"
-        />
-        <RoleCard
-          role="Admin"
-          description="Monitor the entire ecosystem, analyze crowd data, and make data-driven decisions."
-          icon={<Shield className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />}
-          href="/admin"
-        />
+      <div className="z-10 flex justify-center max-w-5xl w-full px-4">
+        <div className="w-full max-w-md">
+          <RoleCard
+            role="Pilgrim"
+            description="Access live crowd info, book virtual queues, and navigate the temple grounds with ease."
+            icon={<User className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />}
+            href="/dashboard"
+          />
+        </div>
       </div>
     </main>
   );
@@ -68,7 +64,24 @@ interface RoleCardProps {
 
 function RoleCard({ role, description, icon, href }: RoleCardProps) {
   return (
-    <Card className="text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-card/80 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/50">
+    <Card className="relative text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-card/80 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/50">
+      <div className="absolute top-2 right-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="w-5 h-5 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link href="/worker">Worker</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin">Admin</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <CardHeader className="items-center">
         <div className="mx-auto bg-primary/10 rounded-full p-3 sm:p-4 w-fit mb-4">
           {icon}
