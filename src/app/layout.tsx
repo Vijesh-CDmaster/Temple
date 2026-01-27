@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { TokenProvider } from '@/context/TokenContext';
 
 export const metadata: Metadata = {
   title: 'TempleConnect',
@@ -25,10 +26,12 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased', 'min-h-screen bg-background font-sans')}>
-        <div className="relative flex min-h-dvh flex-col">
-            {children}
-        </div>
-        <Toaster />
+        <TokenProvider>
+          <div className="relative flex min-h-dvh flex-col">
+              {children}
+          </div>
+          <Toaster />
+        </TokenProvider>
       </body>
     </html>
   );
