@@ -25,7 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Users } from "lucide-react";
-import { temples } from "@/lib/app-data";
+import { temples, timeSlots } from "@/lib/app-data";
 
 const formSchema = z.object({
   temple: z.string().min(1, "Please select a temple."),
@@ -35,17 +35,19 @@ const formSchema = z.object({
   priority: z.enum(["general", "senior", "disabled"]).default("general"),
 });
 
+const defaultValues = {
+    temple: "",
+    date: "",
+    timeSlot: "",
+    numberOfPilgrims: 1,
+    priority: "general" as const,
+};
+
 export default function VirtualQueuePage() {
     const { toast } = useToast();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            temple: "",
-            date: "",
-            timeSlot: "",
-            numberOfPilgrims: 1,
-            priority: "general",
-        },
+        defaultValues,
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -54,7 +56,7 @@ export default function VirtualQueuePage() {
             title: "✅ Booking Successful!",
             description: `Your virtual queue token for ${values.temple} has been generated.`,
         });
-        form.reset();
+        form.reset(defaultValues);
     }
 
   return (
@@ -100,7 +102,7 @@ export default function VirtualQueuePage() {
                                     <FormItem>
                                         <FormLabel>Date</FormLabel>
                                         <FormControl>
-                                            <Input type="date" {...field} value={field.value ?? ""} />
+                                            <Input type="date" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -119,9 +121,11 @@ export default function VirtualQueuePage() {
                                             </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                            <SelectItem value="10:00 - 11:00 AM">10:00 - 11:00 AM</SelectItem>
-                                            <SelectItem value="11:00 - 12:00 PM">11:00 - 12:00 PM</SelectItem>
-                                            <SelectItem value="02:00 - 03:00 PM">02:00 - 03:00 PM</SelectItem>
+                                                {timeSlots.map((slot) => (
+                                                    <SelectItem key={slot.value} value={slot.value}>
+                                                        {slot.label}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -138,7 +142,7 @@ export default function VirtualQueuePage() {
                                 <FormControl>
                                     <div className="relative">
                                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input type="number" placeholder="e.g., 2" {...field} className="pl-10" />
+                                        <Input type="number" placeholder="e.g., 2" {...field} />
                                     </div>
                                 </FormControl>
                                 <FormMessage />

@@ -48,3 +48,30 @@ export const workerZone = {
     crowdDensity: "Medium",
     pilgrimFlow: "Pilgrim flow is steady."
 };
+
+export const timeSlots = [
+    { value: "10:00 - 11:00 AM", label: "10:00 - 11:00 AM" },
+    { value: "11:00 - 12:00 PM", label: "11:00 - 12:00 PM" },
+    { value: "02:00 - 03:00 PM", label: "02:00 - 03:00 PM" },
+];
+
+export const liveStatus = {
+    waitingTime: {
+        value: "~45 mins",
+        description: "For general darshan queue"
+    },
+    templeStatus: {
+        value: "Open",
+        description: "Closes at 9:00 PM"
+    }
+};
+
+export const liveAlert = {
+    title: "Live Alert",
+    description: "High crowd density expected near Gate 3 between 4 PM - 6 PM. Please use alternate routes."
+};
+
+export const workerAlert = {
+    title: "High Priority Alert: SOS Received!",
+    description: "Pilgrim in distress near West Gate. Medical assistance required."
+};

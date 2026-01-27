@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Siren, ListChecks, Users, MapPin, CheckCircle } from "lucide-react";
-import { workerTasks, workerZone } from "@/lib/app-data";
+import { workerTasks, workerZone, workerAlert } from "@/lib/app-data";
 
 export default function WorkerDashboardPage() {
     return (
@@ -14,9 +14,9 @@ export default function WorkerDashboardPage() {
 
             <Alert variant="destructive" className="mb-8">
                 <Siren className="h-4 w-4" />
-                <AlertTitle>High Priority Alert: SOS Received!</AlertTitle>
+                <AlertTitle>{workerAlert.title}</AlertTitle>
                 <AlertDescription className="flex justify-between items-center">
-                    <span>Pilgrim in distress near West Gate. Medical assistance required.</span>
+                    <span>{workerAlert.description}</span>
                     <Button size="sm">Navigate to Incident</Button>
                 </AlertDescription>
             </Alert>

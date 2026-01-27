@@ -7,6 +7,7 @@ import {
   import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
   import { Clock, Building, Siren } from "lucide-react";
   import { CrowdCounter } from "./_components/CrowdCounter";
+  import { liveStatus, liveAlert } from "@/lib/app-data";
   
   export default function LiveStatusPage() {
     return (
@@ -22,24 +23,24 @@ import {
   
         <Alert className="mb-8 border-primary/50 bg-primary/10">
           <Siren className="h-4 w-4 !text-primary" />
-          <AlertTitle className="font-semibold text-primary">Live Alert</AlertTitle>
+          <AlertTitle className="font-semibold text-primary">{liveAlert.title}</AlertTitle>
           <AlertDescription>
-            High crowd density expected near Gate 3 between 4 PM - 6 PM. Please use alternate routes.
+            {liveAlert.description}
           </AlertDescription>
         </Alert>
   
         <div className="grid gap-6 md:grid-cols-2">
           <InfoCard
             title="Estimated Waiting Time"
-            value="~45 mins"
-            description="For general darshan queue"
+            value={liveStatus.waitingTime.value}
+            description={liveStatus.waitingTime.description}
             icon={<Clock className="w-6 h-6 text-amber-600" />}
             colorClass="text-amber-600"
           />
           <InfoCard
             title="Temple Status"
-            value="Open"
-            description="Closes at 9:00 PM"
+            value={liveStatus.templeStatus.value}
+            description={liveStatus.templeStatus.description}
             icon={<Building className="w-6 h-6 text-green-600" />}
             colorClass="text-green-600"
           />
