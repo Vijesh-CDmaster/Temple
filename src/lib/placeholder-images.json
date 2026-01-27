@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "temple-exterior",
+      "description": "A grand temple exterior.",
+      "imageUrl": "https://images.unsplash.com/photo-1678192718739-32af5b437fb2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8dGVtcGxlJTIwaW5kaWF8ZW58MHx8fHwxNzY5NTA4ODk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "temple india"
+    },
+    {
+      "id": "pilgrim-crowd",
+      "description": "A crowd of pilgrims.",
+      "imageUrl": "https://images.unsplash.com/photo-1658051592776-cdc41532a7f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjcm93ZCUyMGZlc3RpdmFsfGVufDB8fHx8MTc2OTUzNDkzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "crowd festival"
+    },
+    {
+      "id": "qr-code",
+      "description": "A sample QR code.",
+      "imageUrl": "https://images.unsplash.com/photo-1550482781-48d477e61c72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxxciUyMGNvZGV8ZW58MHx8fHwxNzY5NTMwNDY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "qr code"
+    },
+    {
+      "id": "temple-1",
+      "description": "Somnath Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1591700430569-9469d38b1006?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzb21uYXRoJTIwdGVtcGxlfGVufDB8fHx8MTc2OTUzNDkzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "somnath temple"
+    },
+    {
+      "id": "temple-2",
+      "description": "Dwarka Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1695824397018-31fa9e2b7a2e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkd2Fya2ElMjB0ZW1wbGV8ZW58MHx8fHwxNzY5NTM0OTM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dwarka temple"
+    },
+    {
+      "id": "temple-3",
+      "description": "Ambaji Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1649668166655-93b619a000a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhbWJhamklMjB0ZW1wbGV8ZW58MHx8fHwxNzY5NTM0OTM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ambaji temple"
+    },
+    {
+      "id": "temple-4",
+      "description": "Pavagadh Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1609151745346-c624e507baa2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYXZhZ2FkaCUyMHRlbXBsZXxlbnwwfHx8fDE3Njk1MzQ5MzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pavagadh temple"
+    },
+    {
+      "id": "map-placeholder",
+      "description": "A placeholder map of a temple complex",
+      "imageUrl": "https://images.unsplash.com/photo-1744056360538-51821f1b19b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYXAlMjBpbGx1c3RyYXRpb258ZW58MHx8fHwxNzY5NTM0OTM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "map illustration"
+    }
+  ]
 }
