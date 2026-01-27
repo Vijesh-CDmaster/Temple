@@ -74,7 +74,7 @@ export default function VirtualQueuePage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Select Temple</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Choose a temple for darshan" />
@@ -100,7 +100,7 @@ export default function VirtualQueuePage() {
                                     <FormItem>
                                         <FormLabel>Date</FormLabel>
                                         <FormControl>
-                                            <Input type="date" {...field} />
+                                            <Input type="date" {...field} value={field.value ?? ""} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -112,7 +112,7 @@ export default function VirtualQueuePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Time Slot</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select a time" />
@@ -154,7 +154,7 @@ export default function VirtualQueuePage() {
                                 <FormControl>
                                     <RadioGroup
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value}
+                                    value={field.value}
                                     className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8"
                                     >
                                     <FormItem className="flex items-center space-x-3 space-y-0">
