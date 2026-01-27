@@ -26,6 +26,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Users } from "lucide-react";
 import { temples, timeSlots } from "@/lib/app-data";
+import { useToken } from "@/context/TokenContext";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   temple: z.string().min(1, "Please select a temple."),
@@ -45,18 +47,34 @@ const defaultValues = {
 
 export default function VirtualQueuePage() {
     const { toast } = useToast();
+    const router = useRouter();
+    const { setActiveToken } = useToken();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues,
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+        const templeAbbreviation = values.temple.substring(0, 3).toUpperCase();
+        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        const newActiveToken = {
+            temple: values.temple,
+            date: values.date,
+            timeSlot: values.timeSlot,
+            pilgrims: `${values.numberOfPilgrims} ${values.numberOfPilgrims > 1 ? 'Pilgrims' : 'Pilgrim'}`,
+            tokenId: `TCN-${templeAbbreviation}-${randomString}`,
+            gate: "Gate 3"
+        }
+
+        setActiveToken(newActiveToken);
+        
         toast({
             title: "✅ Booking Successful!",
             description: `Your virtual queue token for ${values.temple} has been generated.`,
         });
-        form.reset(defaultValues);
+        
+        router.push('/dashboard/my-tokens');
     }
 
   return (

@@ -1,4 +1,3 @@
-
 export const temples = [
     { id: "1", name: "Somnath Temple", location: "Gujarat, India", crowd: "Medium", imageId: "temple-1" },
     { id: "2", name: "Dwarkadhish Temple", location: "Gujarat, India", crowd: "Low", imageId: "temple-2" },
@@ -19,15 +18,6 @@ export const userProfile = {
     language: "English",
     avatar: "https://github.com/shadcn.png",
     avatarFallback: "PD"
-};
-
-export const activeToken = {
-    temple: "Somnath Temple",
-    date: "2024-10-28",
-    timeSlot: "02:00 - 03:00 PM",
-    pilgrims: "2 Adults",
-    tokenId: "TCN-SMN-8A3D5F",
-    gate: "Gate 3"
 };
 
 export const adminStats = {
