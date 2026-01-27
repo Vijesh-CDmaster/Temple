@@ -1,10 +1,8 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { PilgrimHeader } from '@/components/shared/PilgrimHeader';
-import { SosButton } from '@/components/shared/SosButton';
 import { cn } from '@/lib/utils';
-import { RoleSwitcher } from '@/components/shared/RoleSwitcher';
 
 export const metadata: Metadata = {
   title: 'TempleConnect',
@@ -31,7 +29,6 @@ export default function RootLayout({
             {children}
         </div>
         <Toaster />
-        <RoleSwitcher />
       </body>
     </html>
   );
