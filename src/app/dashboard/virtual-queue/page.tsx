@@ -40,6 +40,9 @@ export default function VirtualQueuePage() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            temple: "",
+            date: "",
+            timeSlot: "",
             numberOfPilgrims: 1,
             priority: "general",
         },
