@@ -17,7 +17,17 @@ export const userProfile = {
     phone: "+91 98765 43210",
     language: "English",
     avatar: "https://github.com/shadcn.png",
-    avatarFallback: "PD"
+    avatarFallback: "PD",
+    dob: "1990-01-01",
+    gender: "Male",
+    address: "123, Bhakti Marg",
+    city: "Devnagar",
+    state: "Gujarat",
+    pincode: "362268",
+    emergencyContact: {
+        name: "Krishna Sharma",
+        phone: "+91 98765 12345"
+    }
 };
 
 export const adminStats = {
