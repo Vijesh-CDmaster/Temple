@@ -60,3 +60,16 @@ export const liveAlert = {
     title: "Live Alert",
     description: "High crowd density expected near Gate 3 between 4 PM - 6 PM. Please use alternate routes."
 };
+
+export const workerRoles = [
+    { id: "1", name: "Security / Police" },
+    { id: "2", name: "Medical Staff" },
+    { id: "3", name: "Volunteers" },
+    { id: "4", name: "Queue Managers" },
+    { id: "5", name: "Lost & Found Staff" },
+    { id: "6", name: "Traffic & Parking Staff" },
+    { id: "7", name: "Fire & Disaster Team" },
+    { id: "8", name: "Supervisor" },
+];
+
+export type WorkerRole = typeof workerRoles[0];

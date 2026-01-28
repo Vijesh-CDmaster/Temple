@@ -1,54 +1,57 @@
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useWorker } from "@/context/WorkerContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Siren, ListChecks, BellOff } from "lucide-react";
-import { CrowdCounter } from "@/components/shared/CrowdCounter";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { workerRoles } from "@/lib/app-data";
+import { Briefcase, ArrowRight } from "lucide-react";
 
-export default function WorkerDashboardPage() {
+export default function WorkerLoginPage() {
+    const router = useRouter();
+    const { setWorker, roles } = useWorker();
+    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+    const handleLogin = () => {
+        if (selectedRole) {
+            const role = roles.find(r => r.name === selectedRole);
+            if (role) {
+                setWorker(role);
+                router.push("/worker/dashboard");
+            }
+        }
+    };
+
     return (
-        <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold font-headline">Worker Dashboard</h1>
-                <p className="text-muted-foreground">Your on-ground command center for live monitoring and tasks.</p>
-            </div>
-
-            <div className="mb-8">
-                <CrowdCounter />
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><ListChecks /> Priority Tasks</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center text-center p-8 min-h-[200px]">
-                         <ListChecks className="w-12 h-12 text-muted-foreground mb-4" />
-                         <h3 className="font-semibold text-muted-foreground">No Tasks Assigned</h3>
-                         <p className="text-sm text-muted-foreground mt-1">Your assigned tasks will be listed here.</p>
-                    </CardContent>
-                     <CardFooter>
-                        <Button variant="outline" className="w-full">Refresh Tasks</Button>
-                    </CardFooter>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><Siren /> Active Alerts</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center text-center p-8 min-h-[200px]">
-                       <BellOff className="w-12 h-12 text-muted-foreground mb-4" />
-                       <h3 className="font-semibold text-muted-foreground">No Active Alerts</h3>
-                       <p className="text-sm text-muted-foreground mt-1">High-priority notifications will appear here.</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><Siren /> Incident Reports</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">File a new report or view past incidents in your zone.</p>
-                        <Button className="w-full">File New Report</Button>
-                    </CardContent>
-                </Card>
-            </div>
-        </>
+        <div className="w-full flex items-center justify-center p-4">
+            <Card className="max-w-md w-full">
+                <CardHeader className="text-center">
+                     <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
+                        <Briefcase className="w-10 h-10 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline text-2xl">Worker Login</CardTitle>
+                    <CardDescription>Please select your assigned role to continue</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Select onValueChange={setSelectedRole}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select your role..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {roles.map(role => (
+                                <SelectItem key={role.id} value={role.name}>
+                                    {role.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Button onClick={handleLogin} disabled={!selectedRole} className="w-full" size="lg">
+                        Login <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
     );
 }

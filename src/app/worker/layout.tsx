@@ -1,4 +1,5 @@
-import { WorkerSidebar } from "./_components/sidebar";
+
+import { WorkerProvider } from "@/context/WorkerContext";
 
 export default function WorkerLayout({
   children,
@@ -6,11 +7,10 @@ export default function WorkerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-dvh bg-muted/40">
-      <WorkerSidebar />
-      <div className="flex flex-col flex-1">
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+    <WorkerProvider>
+      <div className="flex min-h-dvh bg-muted/40">
+        {children}
       </div>
-    </div>
+    </WorkerProvider>
   );
 }
