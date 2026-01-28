@@ -9,16 +9,6 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 
-const DefaultIcon = L.icon({
-    iconUrl: icon.src,
-    iconRetinaUrl: iconRetina.src,
-    shadowUrl: iconShadow.src,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
-
 type MarkerData = {
     lat: number;
     lng: number;
@@ -31,19 +21,33 @@ interface InteractiveMapProps {
 }
 
 export default function InteractiveMap({ markers }: InteractiveMapProps) {
+    // Define the icon inside the component to avoid side-effects during re-renders
+    const DefaultIcon = L.icon({
+        iconUrl: icon.src,
+        iconRetinaUrl: iconRetina.src,
+        shadowUrl: iconShadow.src,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+    
     if (!markers || markers.length === 0) {
         return <div className="flex items-center justify-center h-full">No location data available.</div>;
     }
 
     // Calculate the center of the map based on the markers
-    const center = markers.reduce((acc, marker) => {
-        return [acc[0] + marker.lat, acc[1] + marker.lng];
-    }, [0, 0]);
-    center[0] = center[0] / markers.length;
-    center[1] = center[1] / markers.length;
+    const centerLat = markers.reduce((acc, marker) => acc + marker.lat, 0) / markers.length;
+    const centerLng = markers.reduce((acc, marker) => acc + marker.lng, 0) / markers.length;
+    const center: [number, number] = [centerLat, centerLng];
+
+    // IMPORTANT: A unique key forces React to re-create the component when the center changes,
+    // which cleanly destroys and re-initializes the Leaflet map instance.
+    // This prevents the "Map container is already initialized" error in React's Strict Mode.
+    const mapKey = `${center[0]}-${center[1]}`;
 
     return (
-        <MapContainer center={[center[0], center[1]]} zoom={9} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }} className='rounded-lg'>
+        <MapContainer key={mapKey} center={center} zoom={9} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }} className='rounded-lg'>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
