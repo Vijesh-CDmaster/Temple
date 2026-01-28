@@ -13,14 +13,15 @@ const InteractiveMap = dynamic(
     }
 );
 
-export default function MapsPage() {
-    const markers = temples.map(temple => ({
-        lat: temple.lat,
-        lng: temple.lng,
-        name: temple.name,
-        location: temple.location
-    }));
+// Define markers outside the component to prevent re-creation on every render
+const markers = temples.map(temple => ({
+    lat: temple.lat,
+    lng: temple.lng,
+    name: temple.name,
+    location: temple.location
+}));
 
+export default function MapsPage() {
     return (
         <div className="container py-8 flex flex-col h-[calc(100vh-theme(spacing.16))]">
             <div className="mb-8">

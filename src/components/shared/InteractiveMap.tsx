@@ -5,9 +5,9 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// This is a workaround for a known issue with react-leaflet and Next.js asset handling.
+// This is the robust workaround for a known issue with react-leaflet and Next.js asset handling.
 // It ensures that the default icon assets are found correctly.
-// This MUST be done before any components are rendered.
+// This MUST be done once at the module level.
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -19,7 +19,6 @@ L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x.src,
     shadowUrl: markerShadow.src,
 });
-
 
 type MarkerData = {
     lat: number;
@@ -33,6 +32,7 @@ interface InteractiveMapProps {
 }
 
 // This component ensures the Leaflet map instance is properly destroyed on unmount.
+// This is critical in React's Strict Mode and with HMR.
 function MapCleanup() {
   const map = useMap();
   useEffect(() => {
@@ -43,11 +43,11 @@ function MapCleanup() {
   return null;
 }
 
-
 export default function InteractiveMap({ markers }: InteractiveMapProps) {
     const containerRef = useRef<HTMLDivElement | null>(null);
 
-    // This effect ensures that the DOM node is "clean" before React tries to reuse it.
+    // This effect ensures that the DOM node is "clean" before React tries to reuse it,
+    // preventing the "Map container is already initialized" error.
     useEffect(() => {
         return () => {
             if (containerRef.current) {
@@ -55,7 +55,6 @@ export default function InteractiveMap({ markers }: InteractiveMapProps) {
             }
         };
     }, []);
-
 
     if (!markers || markers.length === 0) {
         return <div className="flex items-center justify-center h-full">No location data available.</div>;
