@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Footprints, AlertTriangle, Siren } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, AlertTriangle, Siren } from "lucide-react";
 import { adminStats } from "@/lib/app-data";
+import { CrowdCounter } from "@/components/shared/CrowdCounter";
 
 export default function AdminDashboardPage() {
     return (
@@ -10,8 +11,11 @@ export default function AdminDashboardPage() {
                 <p className="text-muted-foreground">Monitor, predict, and control temple operations.</p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                <StatCard title="Live Footfall" value={adminStats.liveFootfall} icon={<Footprints className="text-primary"/>} />
+            <div className="mb-8">
+                <CrowdCounter />
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
                 <StatCard title="Active Staff" value={adminStats.activeStaff} icon={<Users className="text-primary"/>} />
                 <StatCard title="Active Alerts" value={adminStats.activeAlerts} icon={<AlertTriangle className="text-destructive"/>} />
                 <StatCard title="SOS Requests" value={adminStats.sosRequests} icon={<Siren className="text-destructive"/>} />
