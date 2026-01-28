@@ -1,39 +1,37 @@
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+'use client';
+
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { temples } from '@/lib/app-data';
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Construction } from "lucide-react";
-import Image from "next/image";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function MapsPage() {
-    const mapImage = PlaceHolderImages.find(p => p.id === 'map-placeholder');
+    const InteractiveMap = useMemo(() => dynamic(
+        () => import('@/components/shared/InteractiveMap'),
+        { 
+            ssr: false,
+            loading: () => <Skeleton className="h-full w-full" />
+        }
+    ), []);
+
+    const markers = temples.map(temple => ({
+        lat: temple.lat,
+        lng: temple.lng,
+        name: temple.name,
+        location: temple.location
+    }));
 
     return (
-        <div className="container py-8">
+        <div className="container py-8 flex flex-col h-[calc(100vh-theme(spacing.16))]">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline">Interactive Map</h1>
                 <p className="text-muted-foreground">Navigate the temple complex with ease</p>
             </div>
-
-            <Alert className="mb-8">
-                <Construction className="h-4 w-4" />
-                <AlertTitle>Feature in Development</AlertTitle>
-                <AlertDescription>
-                    The interactive map feature is coming soon. Below is a static preview.
-                </AlertDescription>
-            </Alert>
             
-            <Card>
-                <CardContent className="p-4">
-                    {mapImage && (
-                        <Image 
-                            src={mapImage.imageUrl} 
-                            alt={mapImage.description} 
-                            width={1200}
-                            height={800}
-                            className="rounded-lg w-full h-auto"
-                            data-ai-hint={mapImage.imageHint}
-                        />
-                    )}
+            <Card className='flex-grow'>
+                <CardContent className="p-2 h-full">
+                   <InteractiveMap markers={markers} />
                 </CardContent>
             </Card>
         </div>
