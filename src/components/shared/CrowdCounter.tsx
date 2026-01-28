@@ -14,6 +14,8 @@ const initialState: ResultState = {
   data: null,
 };
 
+const ANALYSIS_INTERVAL = 10000; // 10 seconds
+
 export function CrowdCounter() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,7 +23,6 @@ export function CrowdCounter() {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [resultState, setResultState] = useState<ResultState>(initialState);
-  const [analysisTriggered, setAnalysisTriggered] = useState(false);
 
   const startCamera = async () => {
     setCameraError(null);
@@ -43,26 +44,30 @@ export function CrowdCounter() {
   };
 
   const handleAnalyze = async () => {
-    if (videoRef.current && canvasRef.current && !isPending) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const context = canvas.getContext('2d');
-      if (!context) return;
+    if (isPending || !videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
 
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg');
-
-      const formData = new FormData();
-      formData.append('photoDataUri', dataUrl);
-
-      setIsPending(true);
-      setResultState(initialState);
-      const response = await getCrowdCount(initialState, formData);
-      setResultState(response);
-      setIsPending(false);
+    if (video.readyState < video.HAVE_METADATA || video.videoWidth === 0) {
+      return;
     }
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg');
+
+    const formData = new FormData();
+    formData.append('photoDataUri', dataUrl);
+
+    setIsPending(true);
+    const response = await getCrowdCount(resultState, formData);
+    setResultState(response);
+    setIsPending(false);
   };
 
   useEffect(() => {
@@ -76,15 +81,23 @@ export function CrowdCounter() {
   }, []);
 
   useEffect(() => {
-    if (isCameraOn && !analysisTriggered) {
-      setAnalysisTriggered(true);
-      // Wait for the camera to stabilize
-      setTimeout(() => {
+    if (isCameraOn) {
+      // Initial analysis after a short delay for camera to stabilize
+      const initialTimeout = setTimeout(() => {
         handleAnalyze();
       }, 1500);
+
+      const intervalId = setInterval(() => {
+        handleAnalyze();
+      }, ANALYSIS_INTERVAL);
+
+      return () => {
+        clearTimeout(initialTimeout);
+        clearInterval(intervalId);
+      };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCameraOn, analysisTriggered]);
+  }, [isCameraOn]);
 
 
   return (
@@ -92,13 +105,13 @@ export function CrowdCounter() {
       <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle className="font-headline flex items-center gap-2"><Camera className="text-primary"/> Live Crowd Analysis</CardTitle>
-          <CardDescription>Using your device's camera to get a real-time crowd count and risk assessment.</CardDescription>
+          <CardDescription>Using your device's camera to get a real-time crowd count and risk assessment. Updates automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative aspect-video w-full bg-muted rounded-md overflow-hidden flex items-center justify-center">
             <video ref={videoRef} autoPlay playsInline muted className={cn("w-full h-full object-cover", { 'hidden': !isCameraOn })}></video>
             
-            {isPending && (
+            {isPending && !resultState.data && (
                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-10">
                     <Loader2 className="w-10 h-10 animate-spin mb-4" />
                     <p className="text-lg font-semibold">Analyzing crowd...</p>
@@ -118,26 +131,35 @@ export function CrowdCounter() {
       </Card>
 
       <div className="lg:col-span-2">
-        {resultState.data ? (
-          <AnalysisResults data={resultState.data} />
-        ) : (
-          <Card className="flex h-full min-h-[400px] flex-col items-center justify-center text-center p-8">
-            {isPending ? (
-                 <>
-                    <Loader2 className="h-16 w-16 text-muted-foreground animate-spin mb-4" />
-                    <h3 className="text-xl font-semibold text-muted-foreground">Analysis in Progress</h3>
-                    <p className="text-sm text-muted-foreground mt-2">Please wait while we analyze the camera feed.</p>
-                 </>
+         <Card className="flex h-full min-h-[400px] flex-col">
+           <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                    {isPending && <Loader2 className="h-5 w-5 animate-spin"/>}
+                    {!isPending && resultState.data && <Users className="text-primary"/>}
+                     Crowd Analysis Results
+                </CardTitle>
+            </CardHeader>
+            {resultState.data ? (
+              <AnalysisResults data={resultState.data} />
             ) : (
-                <>
-                    <Users className="h-16 w-16 text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold text-muted-foreground">Analysis will appear here</h3>
-                    <p className="text-sm text-muted-foreground mt-2">The crowd analysis will start automatically.</p>
-                </>
+              <div className="flex-grow flex flex-col items-center justify-center text-center p-8">
+                {isPending ? (
+                    <>
+                        <Loader2 className="h-16 w-16 text-muted-foreground animate-spin mb-4" />
+                        <h3 className="text-xl font-semibold text-muted-foreground">Analysis in Progress</h3>
+                        <p className="text-sm text-muted-foreground mt-2">Please wait while we analyze the camera feed.</p>
+                    </>
+                ) : (
+                    <>
+                        <Users className="h-16 w-16 text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-semibold text-muted-foreground">Waiting for camera...</h3>
+                        <p className="text-sm text-muted-foreground mt-2">The crowd analysis will start automatically.</p>
+                    </>
+                )}
+              </div>
             )}
-          </Card>
-        )}
-        {resultState.message && resultState.message !== 'Analysis successful.' && <p className="text-sm font-medium text-destructive mt-2">{resultState.message}</p>}
+            {resultState.message && resultState.message !== 'Analysis successful.' && <p className="p-4 pt-0 text-sm font-medium text-destructive mt-2">{resultState.message}</p>}
+        </Card>
       </div>
       <canvas ref={canvasRef} className="hidden"></canvas>
     </div>
@@ -152,23 +174,18 @@ function AnalysisResults({ data }: { data: CountCrowdOutput }) {
         High: "text-red-600 bg-red-100 border-red-200 dark:bg-red-900/50 dark:border-red-700",
     }
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><Users className="text-primary"/> Crowd Analysis Results</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Estimated Crowd Count</p>
-                    <p className="text-6xl font-bold">{data.crowdCount}</p>
-                </div>
-                <div className={`p-4 rounded-lg border ${riskColor[data.riskLevel]}`}>
-                    <h4 className="font-semibold flex items-center gap-2"><AlertTriangle/> Risk Level: {data.riskLevel}</h4>
-                </div>
-                <div>
-                    <h4 className="font-semibold mb-2">Analysis</h4>
-                    <p className="text-sm text-muted-foreground bg-muted p-4 rounded-md">{data.analysis}</p>
-                </div>
-            </CardContent>
-        </Card>
+        <CardContent className="space-y-6">
+            <div className="text-center">
+                <p className="text-sm text-muted-foreground">Estimated Crowd Count</p>
+                <p className="text-6xl font-bold">{data.crowdCount}</p>
+            </div>
+            <div className={`p-4 rounded-lg border ${riskColor[data.riskLevel]}`}>
+                <h4 className="font-semibold flex items-center gap-2"><AlertTriangle/> Risk Level: {data.riskLevel}</h4>
+            </div>
+            <div>
+                <h4 className="font-semibold mb-2">Analysis</h4>
+                <p className="text-sm text-muted-foreground bg-muted p-4 rounded-md">{data.analysis}</p>
+            </div>
+        </CardContent>
     )
 }
