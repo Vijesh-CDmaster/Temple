@@ -5,20 +5,19 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// This is a workaround for a known issue with react-leaflet and Next.js
+// This is a workaround for a known issue with react-leaflet and Next.js asset handling.
 // It ensures that the default icon assets are found correctly.
+// This MUST be done before any components are rendered.
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const defaultIcon = L.icon({
+// @ts-ignore
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
     iconUrl: markerIcon.src,
     iconRetinaUrl: markerIcon2x.src,
     shadowUrl: markerShadow.src,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
 });
 
 
@@ -75,7 +74,7 @@ export default function InteractiveMap({ markers }: InteractiveMapProps) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 {markers.map((marker, index) => (
-                    <Marker key={index} position={[marker.lat, marker.lng]} icon={defaultIcon}>
+                    <Marker key={index} position={[marker.lat, marker.lng]}>
                         <Popup>
                             <div className="font-sans">
                                 <h3 className="font-bold text-base mb-1">{marker.name}</h3>
