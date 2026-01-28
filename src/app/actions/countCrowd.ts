@@ -29,6 +29,13 @@ export async function getCrowdCount(prevState: State, formData: FormData): Promi
     return { message: 'Analysis successful.', data: result };
   } catch (error) {
     console.error(error);
-    return { message: 'Analysis failed due to a server error.', data: null };
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    
+    // Provide a more helpful message for the most common error.
+    if (errorMessage.toLowerCase().includes('api key')) {
+        return { message: 'Analysis failed: Invalid or missing Gemini API Key. Please ensure it is set correctly in your .env file and that the Genkit server is running.', data: null };
+    }
+
+    return { message: `Analysis failed: ${errorMessage}`, data: null };
   }
 }
