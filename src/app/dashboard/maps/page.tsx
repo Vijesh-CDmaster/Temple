@@ -1,20 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { temples } from '@/lib/app-data';
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function MapsPage() {
-    const InteractiveMap = useMemo(() => dynamic(
-        () => import('@/components/shared/InteractiveMap'),
-        { 
-            ssr: false,
-            loading: () => <Skeleton className="h-full w-full" />
-        }
-    ), []);
+const InteractiveMap = dynamic(
+    () => import('@/components/shared/InteractiveMap'),
+    { 
+        ssr: false,
+        loading: () => <Skeleton className="h-full w-full rounded-lg" />
+    }
+);
 
+export default function MapsPage() {
     const markers = temples.map(temple => ({
         lat: temple.lat,
         lng: temple.lng,
