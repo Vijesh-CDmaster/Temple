@@ -3,7 +3,7 @@ import {
     CardContent,
   } from "@/components/ui/card";
   import { Button } from "@/components/ui/button";
-  import { ArrowRight, Ticket, Map as MapIcon } from "lucide-react";
+  import { ArrowRight, Ticket } from "lucide-react";
   import Link from "next/link";
   
   export default function DashboardPage() {
@@ -14,18 +14,12 @@ import {
           <p className="text-muted-foreground">Your portal for a seamless pilgrimage</p>
         </div>
   
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-1">
             <ActionCard
                 title="Book Virtual Queue"
                 description="Skip the physical lines by booking your darshan slot in advance."
                 icon={<Ticket className="w-8 h-8 text-primary" />}
                 href="/dashboard/virtual-queue"
-            />
-            <ActionCard
-                title="Interactive Temple Map"
-                description="Navigate through the temple complex, find facilities, and see crowd heatmaps."
-                icon={<MapIcon className="w-8 h-8 text-primary" />}
-                href="/dashboard/maps"
             />
         </div>
       </div>
