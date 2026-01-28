@@ -9,7 +9,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
     iconUrl: icon.src,
     iconRetinaUrl: iconRetina.src,
     shadowUrl: iconShadow.src,
@@ -18,8 +18,6 @@ let DefaultIcon = L.icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 type MarkerData = {
     lat: number;
@@ -51,7 +49,7 @@ export default function InteractiveMap({ markers }: InteractiveMapProps) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {markers.map((marker, index) => (
-                <Marker key={index} position={[marker.lat, marker.lng]}>
+                <Marker key={index} position={[marker.lat, marker.lng]} icon={DefaultIcon}>
                     <Popup>
                         <div className="font-sans">
                             <h3 className="font-bold text-base mb-1">{marker.name}</h3>
