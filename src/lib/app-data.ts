@@ -11,13 +11,12 @@ export const visitHistory = [
     { id: 3, temple: "Ambaji Temple", date: "2023-11-05", status: "Completed" },
 ];
 
-export const userProfile = {
+export const userProfileData = {
     name: "Pilgrim Devotee",
     email: "pilgrim.devotee@example.com",
     phone: "+91 98765 43210",
     language: "English",
     avatar: "https://github.com/shadcn.png",
-    avatarFallback: "PD",
     dob: "1990-01-01",
     gender: "Male",
     address: "123, Bhakti Marg",
@@ -29,6 +28,9 @@ export const userProfile = {
         phone: "+91 98765 12345"
     }
 };
+
+export type UserProfile = typeof userProfileData;
+
 
 export const adminStats = {
     liveFootfall: "12,483",
