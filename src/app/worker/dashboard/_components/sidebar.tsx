@@ -12,13 +12,13 @@ import { useEffect } from "react";
 
 const allNavLinks = [
   { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["all"] },
-  { href: "#", label: "Crowd Control", icon: Users, roles: ["Security / Police", "Supervisor"] },
+  { href: "/worker/dashboard/crowd-control", label: "Crowd Control", icon: Users, roles: ["Security / Police", "Supervisor"] },
   { href: "#", label: "Barricades", icon: Shield, roles: ["Security / Police"] },
-  { href: "#", label: "Emergency Alerts", icon: Siren, roles: ["all"] },
+  { href: "/worker/dashboard/emergency-alerts", label: "Emergency Alerts", icon: Siren, roles: ["all"] },
   { href: "#", label: "Patient Care", icon: HeartPulse, roles: ["Medical Staff"] },
   { href: "#", label: "Assistance Tasks", icon: ListChecks, roles: ["Volunteers"] },
   { href: "#", label: "Queue Flow", icon: Users, roles: ["Queue Managers"] },
-  { href: "#", label: "Lost & Found", icon: Search, roles: ["Lost & Found Staff"] },
+  { href: "/worker/dashboard/lost-and-found", label: "Lost and Found", icon: Search, roles: ["Lost & Found Staff", "Supervisor"] },
   { href: "#", label: "Parking Management", icon: ParkingCircle, roles: ["Traffic & Parking Staff"] },
   { href: "#", label: "Fire & Safety", icon: Flame, roles: ["Fire & Disaster Team"] },
   { href: "#", label: "Zone Overview", icon: Map, roles: ["Supervisor"] },

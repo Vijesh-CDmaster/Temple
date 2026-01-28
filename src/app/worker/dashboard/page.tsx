@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Siren, ListChecks, BellOff } from "lucide-react";
+import { Siren, Users, Search, ArrowRight } from "lucide-react";
 import { CrowdCounter } from "@/components/shared/CrowdCounter";
 import { useWorker } from "@/context/WorkerContext";
+import Link from "next/link";
 
 export default function WorkerDashboardPage() {
     const { worker } = useWorker();
@@ -21,39 +22,67 @@ export default function WorkerDashboardPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><ListChecks /> Priority Tasks</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center text-center p-8 min-h-[200px]">
-                         <ListChecks className="w-12 h-12 text-muted-foreground mb-4" />
-                         <h3 className="font-semibold text-muted-foreground">No Tasks Assigned</h3>
-                         <p className="text-sm text-muted-foreground mt-1">Your assigned tasks will be listed here.</p>
-                    </CardContent>
-                     <CardFooter>
-                        <Button variant="outline" className="w-full">Refresh Tasks</Button>
-                    </CardFooter>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><Siren /> Active Alerts</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center text-center p-8 min-h-[200px]">
-                       <BellOff className="w-12 h-12 text-muted-foreground mb-4" />
-                       <h3 className="font-semibold text-muted-foreground">No Active Alerts</h3>
-                       <p className="text-sm text-muted-foreground mt-1">High-priority notifications will appear here.</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2"><Siren /> Incident Reports</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">File a new report or view past incidents in your zone.</p>
-                        <Button className="w-full">File New Report</Button>
-                    </CardContent>
-                </Card>
+                 <ActionCard
+                    title="Crowd Control"
+                    description="Live crowd analysis and barricade management."
+                    icon={<Users className="text-primary" />}
+                    href="/worker/dashboard/crowd-control"
+                    roles={["Security / Police", "Supervisor"]}
+                    workerRole={worker?.name}
+                 />
+                 <ActionCard
+                    title="Emergency Alerts"
+                    description="View active high-priority alerts and notifications."
+                    icon={<Siren className="text-primary" />}
+                    href="/worker/dashboard/emergency-alerts"
+                    roles={["all"]}
+                    workerRole={worker?.name}
+                 />
+                 <ActionCard
+                    title="Lost & Found"
+                    description="File and manage reports for missing persons and items."
+                    icon={<Search className="text-primary" />}
+                    href="/worker/dashboard/lost-and-found"
+                    roles={["Lost & Found Staff", "Supervisor"]}
+                    workerRole={worker?.name}
+                 />
             </div>
         </>
     );
+}
+
+
+interface ActionCardProps {
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    href: string;
+    roles: string[];
+    workerRole?: string;
+}
+
+function ActionCard({ title, description, icon, href, roles, workerRole }: ActionCardProps) {
+    if (!workerRole || !(roles.includes(workerRole) || roles.includes("all"))) {
+        return null;
+    }
+    
+    return (
+         <Card className="flex flex-col p-6 hover:bg-secondary transition-colors">
+            <div className="flex items-start gap-4">
+                <div className="bg-primary/10 p-3 rounded-lg">
+                    {icon}
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold font-headline">{title}</h3>
+                    <p className="text-muted-foreground text-sm mt-1">{description}</p>
+                </div>
+            </div>
+            <div className="flex-grow" />
+            <Button asChild className="mt-4 ml-auto">
+                <Link href={href}>
+                    Go <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+            </Button>
+        </Card>
+    )
 }
