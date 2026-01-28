@@ -5,9 +5,17 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // This is a workaround for a known issue with react-leaflet and Next.js
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon.src,
+    iconRetinaUrl: markerIcon2x.src,
+    shadowUrl: markerShadow.src,
+});
+
 
 type MarkerData = {
     lat: number;
@@ -21,17 +29,6 @@ interface InteractiveMapProps {
 }
 
 export default function InteractiveMap({ markers }: InteractiveMapProps) {
-    // Define the icon inside the component to avoid side-effects during re-renders
-    const DefaultIcon = L.icon({
-        iconUrl: icon.src,
-        iconRetinaUrl: iconRetina.src,
-        shadowUrl: iconShadow.src,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-    
     if (!markers || markers.length === 0) {
         return <div className="flex items-center justify-center h-full">No location data available.</div>;
     }
@@ -53,7 +50,7 @@ export default function InteractiveMap({ markers }: InteractiveMapProps) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {markers.map((marker, index) => (
-                <Marker key={index} position={[marker.lat, marker.lng]} icon={DefaultIcon}>
+                <Marker key={index} position={[marker.lat, marker.lng]}>
                     <Popup>
                         <div className="font-sans">
                             <h3 className="font-bold text-base mb-1">{marker.name}</h3>
