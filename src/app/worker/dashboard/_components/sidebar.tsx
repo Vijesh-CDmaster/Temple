@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWorker } from "@/context/WorkerContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const allNavLinks = [
   { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["all"] },
@@ -28,11 +29,14 @@ export function WorkerSidebar() {
   const router = useRouter();
   const { worker, setWorker } = useWorker();
 
-  if (!worker) {
-    if (typeof window !== 'undefined') {
-        router.push("/worker");
+  useEffect(() => {
+    if (!worker) {
+      router.push("/worker");
     }
-    return null; // Don't render anything if there's no worker
+  }, [worker, router]);
+
+  if (!worker) {
+    return null; // Don't render anything if there's no worker, while redirecting.
   }
 
   const handleLogout = () => {
