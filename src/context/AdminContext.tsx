@@ -43,7 +43,6 @@ type AdminAuthContextType = {
   currentAdmin: AdminUser | null;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -58,50 +57,22 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const admin = getLocalStorageItem<AdminUser | null>('currentAdmin', null);
     setCurrentAdmin(admin);
-    
-    // Initialize admin user database if it doesn't exist
-    getLocalStorageItem<(AdminUser & { password?: string })[]>('admins', []);
     setIsInitialized(true);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    const admins = getLocalStorageItem<(AdminUser & { password?: string })[]>('admins', []);
-    const admin = admins.find(u => u.email === email && u.password === password);
-
-    if (admin) {
-      if (!admin.email.endsWith('@kgkite.ac.in')) {
-         return Promise.reject(new Error("Login restricted to @kgkite.ac.in emails."));
-      }
-      const { password, ...adminProfile } = admin;
-      setCurrentAdmin(adminProfile);
-      setLocalStorageItem('currentAdmin', adminProfile);
-      return Promise.resolve();
-    } else {
-      return Promise.reject(new Error("Invalid email or password."));
-    }
-  };
-
-  const register = async (name: string, email: string, password: string): Promise<void> => {
     if (!email.endsWith('@kgkite.ac.in')) {
-      return Promise.reject(new Error("Registration is restricted to @kgkite.ac.in emails."));
+       return Promise.reject(new Error("Login restricted to @kgkite.ac.in emails."));
     }
     
-    const admins = getLocalStorageItem<(AdminUser & { password?: string })[]>('admins', []);
-    if (admins.some(u => u.email === email)) {
-      return Promise.reject(new Error("An account with this email already exists."));
-    }
-
-    const newAdmin: AdminUser & { password?: string } = {
-        name,
-        email,
-        password,
+    // For prototyping: allow any @kgkite.ac.in email to log in.
+    const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const adminProfile: AdminUser = {
+        name: name,
+        email: email,
         avatar: `https://api.dicebear.com/8.x/initials/svg?seed=${name}`,
     };
 
-    const { password: _, ...adminProfile } = newAdmin;
-
-    admins.push(newAdmin);
-    setLocalStorageItem('admins', admins);
     setCurrentAdmin(adminProfile);
     setLocalStorageItem('currentAdmin', adminProfile);
     return Promise.resolve();
@@ -115,7 +86,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     router.push('/admin/login');
   };
 
-  const value = { currentAdmin, isInitialized, login, register, logout };
+  const value = { currentAdmin, isInitialized, login, logout };
 
   return (
     <AdminAuthContext.Provider value={value}>

@@ -95,12 +95,6 @@ export default function AdminLoginPage() {
               </Button>
             </form>
           </Form>
-          <div className="mt-6 text-center text-sm">
-            Need an account?{" "}
-            <Link href="/admin/register" className="font-semibold text-primary hover:underline">
-              Register here
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -43,7 +43,6 @@ type WorkerAuthContextType = {
   currentWorker: WorkerUser | null;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
   roles: typeof workerRoles;
 };
@@ -58,48 +57,23 @@ export function WorkerAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const worker = getLocalStorageItem<WorkerUser | null>('currentWorker', null);
     setCurrentWorker(worker);
-    getLocalStorageItem<(WorkerUser & { password?: string })[]>('workers', []);
     setIsInitialized(true);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    const workers = getLocalStorageItem<(WorkerUser & { password?: string })[]>('workers', []);
-    const worker = workers.find(w => w.email === email && w.password === password);
-
-    if (worker) {
-       if (!worker.email.endsWith('@kgkite.ac.in')) {
-         return Promise.reject(new Error("Login restricted to @kgkite.ac.in emails."));
-      }
-      const { password, ...workerProfile } = worker;
-      setCurrentWorker(workerProfile);
-      setLocalStorageItem('currentWorker', workerProfile);
-      return Promise.resolve();
-    } else {
-      return Promise.reject(new Error("Invalid email or password."));
+    if (!email.endsWith('@kgkite.ac.in')) {
+      return Promise.reject(new Error("Login restricted to @kgkite.ac.in emails."));
     }
-  };
-
-  const register = async (name: string, email: string, password: string, role: string): Promise<void> => {
-     if (!email.endsWith('@kgkite.ac.in')) {
-      return Promise.reject(new Error("Registration is restricted to @kgkite.ac.in emails."));
-    }
-    const workers = getLocalStorageItem<(WorkerUser & { password?: string })[]>('workers', []);
-    if (workers.some(w => w.email === email)) {
-      return Promise.reject(new Error("A worker with this email already exists."));
-    }
-
-    const newWorker: WorkerUser & { password?: string } = {
-        name,
-        email,
-        password,
-        role,
+    
+    // For prototyping: allow any @kgkite.ac.in email to log in.
+    const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const workerProfile: WorkerUser = {
+        name: name,
+        email: email,
+        role: 'Supervisor', // Assign a default role to allow access to all dashboard features
         avatar: `https://api.dicebear.com/8.x/initials/svg?seed=${name}`,
     };
-
-    const { password: _, ...workerProfile } = newWorker;
-
-    workers.push(newWorker);
-    setLocalStorageItem('workers', workers);
+    
     setCurrentWorker(workerProfile);
     setLocalStorageItem('currentWorker', workerProfile);
     return Promise.resolve();
@@ -113,7 +87,7 @@ export function WorkerAuthProvider({ children }: { children: ReactNode }) {
     router.push('/worker');
   };
   
-  const value = { currentWorker, isInitialized, login, register, logout, roles: workerRoles };
+  const value = { currentWorker, isInitialized, login, logout, roles: workerRoles };
 
   return (
     <WorkerAuthContext.Provider value={value}>
