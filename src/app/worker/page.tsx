@@ -90,7 +90,7 @@ export default function WorkerLoginPage() {
                             </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+                        <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting} suppressHydrationWarning>
                             {form.formState.isSubmitting ? "Logging in..." : "Access Dashboard"}
                         </Button>
                         </form>
