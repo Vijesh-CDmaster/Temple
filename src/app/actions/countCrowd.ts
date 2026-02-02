@@ -30,10 +30,15 @@ export async function getCrowdCount(prevState: State, formData: FormData): Promi
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    const lowerCaseError = errorMessage.toLowerCase();
     
-    // Provide a more helpful message for the most common error.
-    if (errorMessage.toLowerCase().includes('api key')) {
+    // Provide a more helpful message for common errors.
+    if (lowerCaseError.includes('api key')) {
         return { message: 'Analysis failed: Invalid or missing Gemini API Key. Please ensure it is set correctly in your .env file and that the Genkit server is running.', data: null };
+    }
+
+    if (lowerCaseError.includes('quota exceeded') || lowerCaseError.includes('429')) {
+        return { message: 'Analysis failed: You have exceeded the free tier request limit for the AI model. Please check your plan and billing details, or try again later.', data: null };
     }
 
     return { message: `Analysis failed: ${errorMessage}`, data: null };
