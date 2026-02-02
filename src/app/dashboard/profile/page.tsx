@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from "react";
@@ -41,15 +40,13 @@ export default function ProfilePage() {
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        defaultValues: currentUser || undefined,
-        disabled: !currentUser,
     });
 
     useEffect(() => {
         if (currentUser) {
             form.reset(currentUser);
         }
-    }, [currentUser, form]);
+    }, [currentUser, form.reset]);
     
     function onSubmit(data: ProfileFormValues) {
         if(!currentUser) return;
@@ -205,7 +202,7 @@ export default function ProfilePage() {
                                 </FormItem>
                             )} />
                             <div className="flex justify-end pt-4">
-                                <Button type="submit" size="lg">Save Changes</Button>
+                                <Button type="submit" size="lg" disabled={!currentUser || form.formState.isSubmitting}>Save Changes</Button>
                             </div>
                         </CardContent>
                     </form>
