@@ -12,9 +12,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Briefcase } from "lucide-react";
-import { workerRoles } from "@/lib/app-data";
+import { workerRoleGroups } from "@/lib/app-data";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -125,10 +125,15 @@ export default function WorkerRegisterPage() {
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                {workerRoles.map((role) => (
-                                    <SelectItem key={role.id} value={role.name}>
-                                        {role.name}
-                                    </SelectItem>
+                                {workerRoleGroups.map((group) => (
+                                    <SelectGroup key={group.group}>
+                                        <SelectLabel>{group.group}</SelectLabel>
+                                        {group.roles.map((role) => (
+                                            <SelectItem key={role.id} value={role.name}>
+                                                {role.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
                                 ))}
                             </SelectContent>
                         </Select>
