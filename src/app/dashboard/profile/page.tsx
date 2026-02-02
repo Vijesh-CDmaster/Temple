@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -40,9 +41,15 @@ export default function ProfilePage() {
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        values: currentUser || undefined,
+        defaultValues: currentUser || undefined,
         disabled: !currentUser,
     });
+
+    useEffect(() => {
+        if (currentUser) {
+            form.reset(currentUser);
+        }
+    }, [currentUser, form]);
     
     function onSubmit(data: ProfileFormValues) {
         if(!currentUser) return;
