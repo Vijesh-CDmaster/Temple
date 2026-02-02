@@ -1,28 +1,55 @@
+
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useWorker } from "@/context/WorkerContext";
+import { useWorkerAuth } from "@/context/WorkerContext";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { workerRoles } from "@/lib/app-data";
-import { Briefcase, ArrowRight } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Briefcase } from "lucide-react";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function WorkerLoginPage() {
     const router = useRouter();
-    const { setWorker, roles } = useWorker();
-    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+    const { login } = useWorkerAuth();
+    const { toast } = useToast();
 
-    const handleLogin = () => {
-        if (selectedRole) {
-            const role = roles.find(r => r.name === selectedRole);
-            if (role) {
-                setWorker(role);
-                router.push("/worker/dashboard");
-            }
+    const form = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    });
+
+    async function onSubmit(data: LoginFormValues) {
+        try {
+            await login(data.email, data.password);
+            toast({
+                title: "✅ Login Successful",
+                description: "Welcome, let's get to work!",
+            });
+            router.push("/worker/dashboard");
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "❌ Login Failed",
+                description: error.message || "An unknown error occurred.",
+            });
         }
-    };
+    }
 
     return (
         <div className="w-full flex items-center justify-center p-4">
@@ -31,25 +58,49 @@ export default function WorkerLoginPage() {
                      <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
                         <Briefcase className="w-10 h-10 text-primary" />
                     </div>
-                    <CardTitle className="font-headline text-2xl">Worker Access</CardTitle>
-                    <CardDescription>Select your assigned role to access your dashboard. This is a role-based system for on-ground staff.</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Worker Login</CardTitle>
+                    <CardDescription>Enter your official credentials to access your dashboard.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <Select onValueChange={setSelectedRole}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select your role..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {roles.map(role => (
-                                <SelectItem key={role.id} value={role.name}>
-                                    {role.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <Button onClick={handleLogin} disabled={!selectedRole} className="w-full" size="lg">
-                        Access Dashboard <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Official Email</FormLabel>
+                                <FormControl>
+                                <Input type="email" placeholder="worker@kgkite.ac.in" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                <Input type="password" placeholder="••••••••" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+                            {form.formState.isSubmitting ? "Logging in..." : "Access Dashboard"}
+                        </Button>
+                        </form>
+                    </Form>
+                     <div className="mt-6 text-center text-sm">
+                        Need an account?{" "}
+                        <Link href="/worker/register" className="font-semibold text-primary hover:underline">
+                        Register here
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
         </div>

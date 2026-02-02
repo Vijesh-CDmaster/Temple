@@ -1,14 +1,16 @@
+
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Briefcase, LayoutDashboard, ListChecks, Users, Siren, Map, Menu, Home, Shield, HeartPulse, Search, ParkingCircle, Flame } from "lucide-react";
+import { Briefcase, LayoutDashboard, ListChecks, Users, Siren, Map, Menu, Home, Shield, HeartPulse, Search, ParkingCircle, Flame, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useWorker } from "@/context/WorkerContext";
+import { useWorkerAuth } from "@/context/WorkerContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const allNavLinks = [
   { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["all"] },
@@ -27,26 +29,28 @@ const allNavLinks = [
 export function WorkerSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { worker, setWorker } = useWorker();
+  const { currentWorker, logout } = useWorkerAuth();
 
   useEffect(() => {
-    if (!worker) {
-      router.push("/worker");
+    if (!currentWorker) {
+      router.push("/worker/login");
     }
-  }, [worker, router]);
+  }, [currentWorker, router]);
 
-  if (!worker) {
+  if (!currentWorker) {
     return null; // Don't render anything if there's no worker, while redirecting.
   }
 
   const handleLogout = () => {
-    setWorker(null);
-    router.push("/worker");
+    logout();
+    router.push("/worker/login");
   };
 
   const navLinks = allNavLinks.filter(link => 
-    link.roles.includes("all") || link.roles.includes(worker.name)
+    link.roles.includes("all") || (currentWorker && link.roles.includes(currentWorker.role))
   );
+
+  const avatarFallback = currentWorker.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 
   const navContent = (
     <>
@@ -57,9 +61,16 @@ export function WorkerSidebar() {
             </Link>
         </div>
         <div className="flex-1 overflow-auto py-4">
-            <div className="px-4 mb-4">
-                <p className="text-xs text-muted-foreground">ROLE</p>
-                <p className="font-semibold">{worker.name}</p>
+            <div className="px-4 mb-4 border-b pb-4">
+                <div className="flex items-center gap-3">
+                    <Avatar>
+                        <AvatarFallback>{avatarFallback}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="font-semibold">{currentWorker.name}</p>
+                        <p className="text-xs text-muted-foreground">{currentWorker.role}</p>
+                    </div>
+                </div>
             </div>
             <nav>
                 <ul className="space-y-1 px-2 lg:px-4">
@@ -82,13 +93,13 @@ export function WorkerSidebar() {
         </div>
         <div className="mt-auto border-t p-4 space-y-2">
              <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                <Home className="mr-2 h-4 w-4" />
-                Logout & Switch Role
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
                 <Link href="/">
                     <Home className="mr-2 h-4 w-4" />
-                    Back to Home
+                    Back to Main Page
                 </Link>
             </Button>
         </div>

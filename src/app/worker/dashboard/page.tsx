@@ -1,20 +1,21 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Siren, Users, Search, ArrowRight } from "lucide-react";
 import { CrowdCounter } from "@/components/shared/CrowdCounter";
-import { useWorker } from "@/context/WorkerContext";
+import { useWorkerAuth } from "@/context/WorkerContext";
 import Link from "next/link";
 
 export default function WorkerDashboardPage() {
-    const { worker } = useWorker();
+    const { currentWorker } = useWorkerAuth();
 
     return (
         <>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline">Worker Dashboard</h1>
-                <p className="text-muted-foreground">You are logged in as a <span className="font-semibold text-primary">{worker?.name}</span>.</p>
+                <p className="text-muted-foreground">You are logged in as a <span className="font-semibold text-primary">{currentWorker?.role}</span>.</p>
             </div>
 
             <div className="mb-8">
@@ -28,7 +29,7 @@ export default function WorkerDashboardPage() {
                     icon={<Users className="text-primary" />}
                     href="/worker/dashboard/crowd-control"
                     roles={["Security / Police", "Supervisor"]}
-                    workerRole={worker?.name}
+                    workerRole={currentWorker?.role}
                  />
                  <ActionCard
                     title="Emergency Alerts"
@@ -36,7 +37,7 @@ export default function WorkerDashboardPage() {
                     icon={<Siren className="text-primary" />}
                     href="/worker/dashboard/emergency-alerts"
                     roles={["all"]}
-                    workerRole={worker?.name}
+                    workerRole={currentWorker?.role}
                  />
                  <ActionCard
                     title="Lost & Found"
@@ -44,7 +45,7 @@ export default function WorkerDashboardPage() {
                     icon={<Search className="text-primary" />}
                     href="/worker/dashboard/lost-and-found"
                     roles={["Lost & Found Staff", "Supervisor"]}
-                    workerRole={worker?.name}
+                    workerRole={currentWorker?.role}
                  />
             </div>
         </>

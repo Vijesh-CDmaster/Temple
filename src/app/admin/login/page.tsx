@@ -6,14 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAdminAuth } from "@/context/AdminContext";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LogIn, Shield, Briefcase } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Shield } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address."),
@@ -22,9 +21,9 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login } = useAdminAuth();
   const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
@@ -39,10 +38,10 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password);
       toast({
-        title: "✅ Login Successful",
-        description: "Welcome back!",
+        title: "✅ Admin Login Successful",
+        description: "Welcome to the Command Center.",
       });
-      router.push("/dashboard");
+      router.push("/admin");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -53,14 +52,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-muted/40 p-4">
+    <div className="w-full flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
-            <LogIn className="w-10 h-10 text-primary" />
+            <Shield className="w-10 h-10 text-primary" />
           </div>
-          <CardTitle className="font-headline text-2xl">Pilgrim Login</CardTitle>
-          <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
+          <CardTitle className="font-headline text-2xl">Admin Login</CardTitle>
+          <CardDescription>Enter your official credentials to access the admin panel.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -70,9 +69,9 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Official Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input type="email" placeholder="admin@kgkite.ac.in" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -92,31 +91,17 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Logging in..." : "Login"}
+                {form.formState.isSubmitting ? "Logging in..." : "Access Command Center"}
               </Button>
             </form>
           </Form>
           <div className="mt-6 text-center text-sm">
-            Don't have an account?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">
+            Need an account?{" "}
+            <Link href="/admin/register" className="font-semibold text-primary hover:underline">
               Register here
             </Link>
           </div>
         </CardContent>
-        <CardFooter className="flex-col items-center gap-4">
-            <Separator />
-            <div className="text-center text-sm text-muted-foreground">
-                <p>Are you a staff member?</p>
-                <div className="flex items-center gap-4 mt-2">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href="/worker/login"><Briefcase className="mr-2"/> Worker Login</Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href="/admin/login"><Shield className="mr-2"/> Admin Login</Link>
-                    </Button>
-                </div>
-            </div>
-        </CardFooter>
       </Card>
     </div>
   );

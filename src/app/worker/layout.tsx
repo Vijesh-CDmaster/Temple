@@ -1,5 +1,5 @@
 
-import { WorkerProvider } from "@/context/WorkerContext";
+import { WorkerAuthProvider } from "@/context/WorkerContext";
 
 export default function WorkerLayout({
   children,
@@ -7,10 +7,10 @@ export default function WorkerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <WorkerProvider>
+    <WorkerAuthProvider>
       <div className="flex min-h-dvh bg-muted/40">
         {children}
       </div>
-    </WorkerProvider>
+    </WorkerAuthProvider>
   );
 }
