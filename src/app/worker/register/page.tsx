@@ -44,8 +44,28 @@ export default function WorkerRegisterPage() {
   });
 
   async function onSubmit(data: RegisterFormValues) {
+    const roleName = data.role;
+    let roleGroup = "";
+
+    // Find the group this role belongs to
+    for (const group of workerRoleGroups) {
+        if (group.roles.some(r => r.name === roleName)) {
+            roleGroup = group.group;
+            break;
+        }
+    }
+
+    if (!roleGroup) {
+        toast({
+            variant: "destructive",
+            title: "❌ Registration Failed",
+            description: "Could not determine the role group. Please try again.",
+        });
+        return;
+    }
+
     try {
-      await register(data.name, data.email, data.password, data.role);
+      await register(data.name, data.email, data.password, roleName, roleGroup);
       toast({
         title: "✅ Registration Successful",
         description: "Your worker account has been created.",
@@ -148,7 +168,7 @@ export default function WorkerRegisterPage() {
           </Form>
            <div className="mt-6 text-center text-sm">
             Already have an account?{" "}
-            <Link href="/worker/login" className="font-semibold text-primary hover:underline">
+            <Link href="/worker" className="font-semibold text-primary hover:underline">
               Login here
             </Link>
           </div>

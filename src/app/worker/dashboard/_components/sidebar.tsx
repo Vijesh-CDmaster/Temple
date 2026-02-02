@@ -13,17 +13,17 @@ import { useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const allNavLinks = [
-  { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["all"] },
-  { href: "/worker/dashboard/crowd-control", label: "Crowd Control", icon: Users, roles: ["Security / Police", "Supervisor"] },
-  { href: "#", label: "Barricades", icon: Shield, roles: ["Security / Police"] },
-  { href: "/worker/dashboard/emergency-alerts", label: "Emergency Alerts", icon: Siren, roles: ["all"] },
-  { href: "#", label: "Patient Care", icon: HeartPulse, roles: ["Medical Staff"] },
-  { href: "#", label: "Assistance Tasks", icon: ListChecks, roles: ["Volunteers"] },
-  { href: "#", label: "Queue Flow", icon: Users, roles: ["Queue Managers"] },
-  { href: "/worker/dashboard/lost-and-found", label: "Lost and Found", icon: Search, roles: ["Lost & Found Staff", "Supervisor"] },
-  { href: "#", label: "Parking Management", icon: ParkingCircle, roles: ["Traffic & Parking Staff"] },
-  { href: "#", label: "Fire & Safety", icon: Flame, roles: ["Fire & Disaster Team"] },
-  { href: "#", label: "Zone Overview", icon: Map, roles: ["Supervisor"] },
+  { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard, groups: ["all"] },
+  { href: "/worker/dashboard/crowd-control", label: "Crowd Control", icon: Users, groups: ["Security (Inside Temple)", "Security (Parking Area)"] },
+  { href: "#", label: "Barricades", icon: Shield, groups: ["Security (Inside Temple)", "Security (Parking Area)"] },
+  { href: "/worker/dashboard/emergency-alerts", label: "Emergency Alerts", icon: Siren, groups: ["all"] },
+  { href: "#", label: "Patient Care", icon: HeartPulse, groups: ["Public Help & Safety (Parking Area)"] },
+  { href: "#", label: "Assistance Tasks", icon: ListChecks, groups: ["Guidance (Inside Temple)", "Transport Assistance (Parking Area)"] },
+  { href: "#", label: "Queue Flow", icon: Users, groups: ["Parking Control & Traffic Flow"] },
+  { href: "/worker/dashboard/lost-and-found", label: "Lost and Found", icon: Search, groups: ["Guidance (Inside Temple)"] },
+  { href: "#", label: "Parking Management", icon: ParkingCircle, groups: ["Parking Control & Traffic Flow"] },
+  { href: "#", label: "Fire & Safety", icon: Flame, groups: ["Public Help & Safety (Parking Area)"] },
+  { href: "#", label: "Zone Overview", icon: Map, groups: ["Parking Control & Traffic Flow"] },
 ];
 
 export function WorkerSidebar() {
@@ -46,9 +46,13 @@ export function WorkerSidebar() {
     router.push("/worker");
   };
 
-  const navLinks = allNavLinks.filter(link => 
-    link.roles.includes("all") || (currentWorker && link.roles.includes(currentWorker.role))
-  );
+  const hasAccess = (allowedGroups: string[]) => {
+    if (allowedGroups.includes("all")) return true;
+    if (currentWorker.role.includes('Supervisor')) return true;
+    return allowedGroups.includes(currentWorker.roleGroup);
+  };
+  
+  const navLinks = allNavLinks.filter(link => hasAccess(link.groups));
 
   const avatarFallback = currentWorker.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 

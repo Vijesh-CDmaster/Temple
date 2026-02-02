@@ -3,13 +3,14 @@
 
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { workerRoles } from '@/lib/app-data';
+import { workerRoles, workerRoleGroups } from '@/lib/app-data';
 
 
 export type WorkerUser = {
   name: string;
   email: string;
   role: string;
+  roleGroup: string;
   avatar: string;
 };
 
@@ -43,6 +44,7 @@ type WorkerAuthContextType = {
   currentWorker: WorkerUser | null;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, role: string, roleGroup: string) => Promise<void>;
   logout: () => void;
   roles: typeof workerRoles;
 };
@@ -57,23 +59,63 @@ export function WorkerAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const worker = getLocalStorageItem<WorkerUser | null>('currentWorker', null);
     setCurrentWorker(worker);
+
+    // Initialize workers database if it doesn't exist
+    getLocalStorageItem<any[]>('workers', []);
+
     setIsInitialized(true);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    if (!email.endsWith('@kgkite.ac.in')) {
-      return Promise.reject(new Error("Login restricted to @kgkite.ac.in emails."));
+    const workers = getLocalStorageItem<(WorkerUser & { password?: string })[]>('workers', []);
+    const worker = workers.find(w => w.email === email && w.password === password);
+
+    if (worker) {
+        // Found a registered worker
+        const { password, ...workerProfile } = worker;
+        setCurrentWorker(workerProfile);
+        setLocalStorageItem('currentWorker', workerProfile);
+        return Promise.resolve();
+    } 
+    
+    // Worker not found, try fallback for prototyping if email is valid
+    if (email.endsWith('@kgkite.ac.in')) {
+        const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const workerProfile: WorkerUser = {
+            name: name,
+            email: email,
+            role: 'Parking Supervisors', // A default supervisor role
+            roleGroup: 'Parking Control & Traffic Flow', // The group for that role
+            avatar: `https://api.dicebear.com/8.x/initials/svg?seed=${name}`,
+        };
+        
+        setCurrentWorker(workerProfile);
+        setLocalStorageItem('currentWorker', workerProfile);
+        return Promise.resolve();
     }
     
-    // For prototyping: allow any @kgkite.ac.in email to log in.
-    const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    const workerProfile: WorkerUser = {
-        name: name,
-        email: email,
-        role: 'Supervisor', // Assign a default role to allow access to all dashboard features
+    return Promise.reject(new Error("Invalid credentials."));
+  };
+
+  const register = async (name: string, email: string, password: string, role: string, roleGroup: string): Promise<void> => {
+    const workers = getLocalStorageItem<(WorkerUser & { password?: string })[]>('workers', []);
+    if (workers.some(w => w.email === email)) {
+      return Promise.reject(new Error("A worker with this email already exists."));
+    }
+
+    const newWorker: WorkerUser & { password?: string } = {
+        name,
+        email,
+        password,
+        role,
+        roleGroup,
         avatar: `https://api.dicebear.com/8.x/initials/svg?seed=${name}`,
     };
-    
+
+    const { password: _, ...workerProfile } = newWorker;
+
+    workers.push(newWorker);
+    setLocalStorageItem('workers', workers);
     setCurrentWorker(workerProfile);
     setLocalStorageItem('currentWorker', workerProfile);
     return Promise.resolve();
@@ -87,7 +129,7 @@ export function WorkerAuthProvider({ children }: { children: ReactNode }) {
     router.push('/worker');
   };
   
-  const value = { currentWorker, isInitialized, login, logout, roles: workerRoles };
+  const value = { currentWorker, isInitialized, login, register, logout, roles: workerRoles };
 
   return (
     <WorkerAuthContext.Provider value={value}>

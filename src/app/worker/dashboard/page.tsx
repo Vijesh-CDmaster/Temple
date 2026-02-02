@@ -15,7 +15,7 @@ export default function WorkerDashboardPage() {
         <>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline">Worker Dashboard</h1>
-                <p className="text-muted-foreground">You are logged in as a <span className="font-semibold text-primary">{currentWorker?.role}</span>.</p>
+                <p className="text-muted-foreground">You are logged in as a <span className="font-semibold text-primary">{currentWorker?.role}</span> in the <span className="font-semibold text-primary">{currentWorker?.roleGroup}</span> group.</p>
             </div>
 
             <div className="mb-8">
@@ -28,24 +28,24 @@ export default function WorkerDashboardPage() {
                     description="Live crowd analysis and barricade management."
                     icon={<Users className="text-primary" />}
                     href="/worker/dashboard/crowd-control"
-                    roles={["Security / Police", "Supervisor"]}
-                    workerRole={currentWorker?.role}
+                    groups={["Security (Inside Temple)", "Security (Parking Area)"]}
+                    worker={currentWorker}
                  />
                  <ActionCard
                     title="Emergency Alerts"
                     description="View active high-priority alerts and notifications."
                     icon={<Siren className="text-primary" />}
                     href="/worker/dashboard/emergency-alerts"
-                    roles={["all"]}
-                    workerRole={currentWorker?.role}
+                    groups={["all"]}
+                    worker={currentWorker}
                  />
                  <ActionCard
                     title="Lost & Found"
                     description="File and manage reports for missing persons and items."
                     icon={<Search className="text-primary" />}
                     href="/worker/dashboard/lost-and-found"
-                    roles={["Lost & Found Staff", "Supervisor"]}
-                    workerRole={currentWorker?.role}
+                    groups={["Guidance (Inside Temple)"]}
+                    worker={currentWorker}
                  />
             </div>
         </>
@@ -58,12 +58,20 @@ interface ActionCardProps {
     description: string;
     icon: React.ReactNode;
     href: string;
-    roles: string[];
-    workerRole?: string;
+    groups: string[];
+    worker: ReturnType<typeof useWorkerAuth>['currentWorker'];
 }
 
-function ActionCard({ title, description, icon, href, roles, workerRole }: ActionCardProps) {
-    if (!workerRole || !(roles.includes(workerRole) || roles.includes("all"))) {
+function ActionCard({ title, description, icon, href, groups, worker }: ActionCardProps) {
+    const hasAccess = () => {
+        if (!worker) return false;
+        if (groups.includes("all")) return true;
+        // Supervisors have access to all features
+        if (worker.role.includes("Supervisor")) return true;
+        return groups.includes(worker.roleGroup);
+    };
+
+    if (!hasAccess()) {
         return null;
     }
     
