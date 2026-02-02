@@ -110,7 +110,7 @@ export function WorkerAuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
         window.localStorage.removeItem('currentWorker');
     }
-    router.push('/worker/login');
+    router.push('/worker');
   };
   
   const value = { currentWorker, isInitialized, login, register, logout, roles: workerRoles };

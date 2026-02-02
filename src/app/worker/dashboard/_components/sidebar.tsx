@@ -33,7 +33,7 @@ export function WorkerSidebar() {
 
   useEffect(() => {
     if (!currentWorker) {
-      router.push("/worker/login");
+      router.push("/worker");
     }
   }, [currentWorker, router]);
 
@@ -43,7 +43,7 @@ export function WorkerSidebar() {
 
   const handleLogout = () => {
     logout();
-    router.push("/worker/login");
+    router.push("/worker");
   };
 
   const navLinks = allNavLinks.filter(link => 

@@ -17,7 +17,7 @@ export default function WorkerDashboardLayout({
 
   useEffect(() => {
     if (isInitialized && !currentWorker) {
-      router.push('/worker/login');
+      router.push('/worker');
     }
   }, [currentWorker, isInitialized, router]);
 
