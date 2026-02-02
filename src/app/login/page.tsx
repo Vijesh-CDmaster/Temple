@@ -109,7 +109,7 @@ export default function LoginPage() {
                 <p>Are you a staff member?</p>
                 <div className="flex items-center gap-4 mt-2">
                     <Button variant="outline" size="sm" asChild>
-                        <Link href="/worker/login"><Briefcase className="mr-2"/> Worker Login</Link>
+                        <Link href="/worker"><Briefcase className="mr-2"/> Worker Login</Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
                         <Link href="/admin/login"><Shield className="mr-2"/> Admin Login</Link>
