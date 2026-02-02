@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useProfile } from "@/context/ProfileContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,26 +35,25 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
-    const { profile, setProfile } = useProfile();
+    const { currentUser, updateUser } = useAuth();
     const { toast } = useToast();
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        values: profile || undefined, // Use values to pre-populate and track
-        disabled: !profile, // Disable form until profile is loaded
+        values: currentUser || undefined,
+        disabled: !currentUser,
     });
     
     function onSubmit(data: ProfileFormValues) {
-        if(!profile) return;
-        const newProfile = {...profile, ...data};
-        setProfile(newProfile);
+        if(!currentUser) return;
+        updateUser(data);
         toast({
             title: "✅ Profile Updated",
             description: "Your information has been saved successfully.",
         });
     }
 
-    if (!profile) {
+    if (!currentUser) {
         return (
              <div className="container py-8">
                 <div className="mb-8">
@@ -81,7 +80,7 @@ export default function ProfilePage() {
         )
     }
 
-    const avatarFallback = profile.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+    const avatarFallback = currentUser.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 
     return (
         <div className="container py-8">
@@ -94,11 +93,11 @@ export default function ProfilePage() {
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <CardHeader className="items-center text-center">
                             <Avatar className="w-24 h-24 mb-4">
-                                <AvatarImage src={profile.avatar} alt="User Avatar" />
+                                <AvatarImage src={currentUser.avatar} alt="User Avatar" />
                                 <AvatarFallback>{avatarFallback}</AvatarFallback>
                             </Avatar>
-                            <CardTitle className="font-headline text-2xl">{profile.name}</CardTitle>
-                            <CardDescription>{profile.email}</CardDescription>
+                            <CardTitle className="font-headline text-2xl">{currentUser.name}</CardTitle>
+                            <CardDescription>{currentUser.email}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-8">
                             <div>

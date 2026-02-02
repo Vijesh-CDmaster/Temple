@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { TokenProvider } from '@/context/TokenContext';
-import { ProfileProvider } from '@/context/ProfileContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'TempleConnect',
@@ -27,14 +27,14 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased', 'min-h-screen bg-background font-sans')}>
-        <ProfileProvider>
+        <AuthProvider>
           <TokenProvider>
             <div className="relative flex min-h-dvh flex-col">
                 {children}
             </div>
             <Toaster />
           </TokenProvider>
-        </ProfileProvider>
+        </AuthProvider>
       </body>
     </html>
   );

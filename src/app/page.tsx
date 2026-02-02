@@ -44,7 +44,7 @@ export default function Home() {
           title="Pilgrim"
           description="Access dashboard for darshan booking, live status, and more."
           icon={<User className="w-10 h-10 text-primary" />}
-          href="/dashboard"
+          href="/login"
         />
         <RoleCard
           title="Worker"
