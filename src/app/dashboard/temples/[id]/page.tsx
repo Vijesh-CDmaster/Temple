@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ArrowLeft, Landmark, ScrollText, Sparkles, Gem, Wand2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from 'react';
+import { useFormStatus } from "react-dom";
 import { generateTempleSummary } from "@/app/actions/getTempleSummaryAction";
 
 const initialState = {
@@ -35,7 +36,7 @@ function SubmitButton() {
 }
 
 function AIGeneratedSummary({ templeName, location }: { templeName: string, location: string }) {
-  const [state, formAction] = useFormState(generateTempleSummary, initialState);
+  const [state, formAction] = useActionState(generateTempleSummary, initialState);
 
   const formatSummary = (summary: string | null) => {
     if (!summary) return null;
