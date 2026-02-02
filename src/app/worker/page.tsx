@@ -31,8 +31,8 @@ export default function WorkerLoginPage() {
                      <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4">
                         <Briefcase className="w-10 h-10 text-primary" />
                     </div>
-                    <CardTitle className="font-headline text-2xl">Worker Login</CardTitle>
-                    <CardDescription>Please select your assigned role to continue</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Worker Access</CardTitle>
+                    <CardDescription>Select your assigned role to access your dashboard. This is a role-based system for on-ground staff.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <Select onValueChange={setSelectedRole}>
@@ -48,7 +48,7 @@ export default function WorkerLoginPage() {
                         </SelectContent>
                     </Select>
                     <Button onClick={handleLogin} disabled={!selectedRole} className="w-full" size="lg">
-                        Login <ArrowRight className="ml-2 w-4 h-4" />
+                        Access Dashboard <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                 </CardContent>
             </Card>
