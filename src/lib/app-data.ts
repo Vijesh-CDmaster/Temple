@@ -1,9 +1,69 @@
 
 export const temples = [
-    { id: "1", name: "Somnath Temple", location: "Gujarat, India", crowd: "Medium", imageId: "temple-1", lat: 20.8880, lng: 70.4012 },
-    { id: "2", name: "Dwarkadhish Temple", location: "Gujarat, India", crowd: "Low", imageId: "temple-2", lat: 22.2375, lng: 68.9675 },
-    { id: "3", name: "Ambaji Temple", location: "Gujarat, India", crowd: "High", imageId: "temple-3", lat: 24.3312, lng: 72.8525 },
-    { id: "4", name: "Pavagadh Temple", location: "Gujarat, India", crowd: "Medium", imageId: "temple-4", lat: 22.4607, lng: 73.5185 },
+    { 
+        id: "1", 
+        name: "Somnath Temple", 
+        location: "Gujarat, India", 
+        crowd: "Medium", 
+        imageId: "temple-1", 
+        lat: 20.8880, 
+        lng: 70.4012,
+        history: "One of the twelve Jyotirlinga shrines of Shiva, the Somnath temple has a history of being destroyed and rebuilt multiple times by various invaders and kings. It stands as a symbol of resilience and devotion.",
+        mythology: "According to mythology, the temple was originally built by Soma, the Moon God, in gold, as a tribute to Lord Shiva who cured his illness. It was subsequently rebuilt by Ravana in silver, by Krishna in sandalwood, and by Bhimdev in stone.",
+        mysteries: [
+            "The temple's location is unique; an inscription on the Baan Stambh (Arrow Pillar) states that there is no land in a straight line between the temple and Antarctica.",
+            "An ancient treasure, the Syamantaka jewel, is believed to be hidden within the temple's foundation, protected by mystical forces."
+        ],
+        architecture: "The temple is built in the Chalukya style of architecture, also known as 'Kailash Mahameru Prasad' style. It features a towering shikhara (spire), a grand sabha mandap (assembly hall), and intricate carvings depicting Hindu deities and epics."
+    },
+    { 
+        id: "2", 
+        name: "Dwarkadhish Temple", 
+        location: "Gujarat, India", 
+        crowd: "Low", 
+        imageId: "temple-2", 
+        lat: 22.2375, 
+        lng: 68.9675,
+        history: "Also known as Jagat Mandir, the Dwarkadhish Temple is a Hindu temple dedicated to Lord Krishna. The main shrine of the 5-storied building, supported by 72 pillars, is said to be 2,200 - 2,500 years old.",
+        mythology: "It is believed that the original temple was built by Krishna's grandson, Vajranabha, over the hari-griha (Lord Krishna's residential place).",
+        mysteries: [
+            "The flag atop the temple, known as the Dhwaja, is changed five times a day, and it is a great honor to sponsor a new flag.",
+            "The temple has two entrances: 'Swarga Dwar' (gate to heaven) for entry and 'Moksha Dwar' (gate to salvation) for exit."
+        ],
+        architecture: "The temple is constructed of limestone and sand. The intricate sculptural detailing on the exterior and interior is a testament to the skill of the artisans of its time."
+    },
+    { 
+        id: "3", 
+        name: "Ambaji Temple", 
+        location: "Gujarat, India", 
+        crowd: "High", 
+        imageId: "temple-3", 
+        lat: 24.3312, 
+        lng: 72.8525,
+        history: "A major Shakti Peeth of India, it is believed that the heart of Goddess Sati fell here. The temple is one of the 51 Shakti Peethas.",
+        mythology: "There is no idol in the temple; the 'Vishwa Yantra' is worshiped instead. It is believed that the tonsure ceremony of Lord Krishna took place here.",
+        mysteries: [
+            "The original seat of Ambaji is on Gabbar hilltop. A lamp is always lit on this hill, and its flame can be seen from the main temple.",
+            "It is forbidden to view the Yantra with the naked eye."
+        ],
+        architecture: "The temple is made of white marble with golden cones. It has a main entrance and another small door on the side. The open square, called 'chachar chowk', is where ceremonial sacrifices called 'havan' are performed."
+    },
+    { 
+        id: "4", 
+        name: "Pavagadh Temple", 
+        location: "Gujarat, India", 
+        crowd: "Medium", 
+        imageId: "temple-4", 
+        lat: 22.4607, 
+        lng: 73.5185,
+        history: "The Mahakali temple at Pavagadh is a revered Hindu pilgrimage site and one of the 51 Shakti Peethas. The temple complex is part of the Champaner-Pavagadh Archaeological Park, a UNESCO World Heritage Site.",
+        mythology: "It is believed that the right toe of Goddess Sati fell at this location. The temple is also associated with the sage Vishwamitra, who is said to have installed the idol of Kalika Mata here.",
+        mysteries: [
+            "The temple is situated on a cliff, and pilgrims traditionally had to climb over 2000 steps to reach it, though a ropeway is now available.",
+            "The site has a unique syncretic nature, with a dargah (tomb) of a Muslim saint also present within the temple complex."
+        ],
+        architecture: "The temple is an example of a fortress-temple, reflecting its strategic location on a hilltop. The architecture is a blend of Hindu and Islamic styles, a characteristic of the region's history."
+    },
 ];
 
 export const visitHistory = [
