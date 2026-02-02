@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from "./_components/sidebar";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminContext';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,16 +10,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   const { currentAdmin, isInitialized } = useAdminAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isPublicRoute = pathname === '/admin/login' || pathname === '/admin/register';
 
   useEffect(() => {
-    if (isInitialized && !currentAdmin) {
+    if (isInitialized && !currentAdmin && !isPublicRoute) {
       router.push('/admin/login');
     }
-  }, [currentAdmin, isInitialized, router]);
+  }, [currentAdmin, isInitialized, router, isPublicRoute]);
+  
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
 
   if (!isInitialized || !currentAdmin) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center w-full">
         <div className="w-full flex">
           <div className="hidden md:flex w-64">
             <div className="p-4 space-y-2 w-full">
@@ -40,7 +47,7 @@ function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-dvh bg-muted/40">
+    <div className="flex min-h-dvh bg-muted/40 w-full">
       <AdminSidebar />
       <div className="flex flex-col flex-1">
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
