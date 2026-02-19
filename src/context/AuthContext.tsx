@@ -44,14 +44,26 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Initialize state directly from localStorage for faster initial render
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const item = window.localStorage.getItem('currentUser');
+        return item ? JSON.parse(item) : null;
+      } catch { return null; }
+    }
+    return null;
+  });
+  const [isInitialized, setIsInitialized] = useState(typeof window !== 'undefined');
   const router = useRouter();
 
   // Load initial state from localStorage
   useEffect(() => {
-    const user = getLocalStorageItem<UserProfile | null>('currentUser', null);
-    setCurrentUser(user);
+    if (!isInitialized) {
+      const user = getLocalStorageItem<UserProfile | null>('currentUser', null);
+      setCurrentUser(user);
+      setIsInitialized(true);
+    }
     
     // Initialize user database if it doesn't exist
     const users = getLocalStorageItem<any[]>('users', []);

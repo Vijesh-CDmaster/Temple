@@ -1,14 +1,20 @@
-
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { TokenProvider } from '@/context/TokenContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'TempleConnect',
   description: 'Smart Pilgrimage Crowd Management System',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
@@ -29,9 +35,11 @@ export default function RootLayout({
       <body className={cn('font-body antialiased', 'min-h-screen bg-background font-sans')}>
         <AuthProvider>
           <TokenProvider>
-            <div className="relative flex min-h-dvh flex-col">
-                {children}
-            </div>
+            <Suspense fallback={null}>
+              <div className="relative flex min-h-dvh flex-col">
+                  {children}
+              </div>
+            </Suspense>
             <Toaster />
           </TokenProvider>
         </AuthProvider>

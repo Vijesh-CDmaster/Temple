@@ -1,0 +1,39 @@
+# Crowd Density Estimation System - Requirements
+# =============================================
+# All packages are free and open-source
+# No paid APIs or cloud services required
+
+# Core Deep Learning (PyTorch)
+# ----------------------------
+# Install PyTorch based on your system:
+# CPU only: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# CUDA 11.8: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+# CUDA 12.1: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Computer Vision
+# ---------------
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# Optional: YOLOv8 for low-density validation zones
+# (Ultralytics AGPL license - free for non-commercial use)
+ultralytics>=8.0.0
+
+# API Server
+# ----------
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+
+# Utilities
+# ---------
+Pillow>=10.0.0
+
+# Development/Testing (optional)
+# ------------------------------
+# pytest>=7.0.0
+# black>=23.0.0
+# mypy>=1.0.0

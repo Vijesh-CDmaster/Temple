@@ -4,8 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCrowdCount } from "@/app/actions/countCrowd";
-import type { State as ResultState } from "@/app/actions/countCrowd";
-import type { CountCrowdOutput } from "@/ai/flows/count-crowd-flow";
+import type { State as ResultState, CrowdAnalysisResult } from "@/app/actions/countCrowd";
 import { Camera, Users, Loader2, VideoOff, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +13,8 @@ const initialState: ResultState = {
   data: null,
 };
 
-const ANALYSIS_INTERVAL = 10000; // 10 seconds
+const ANALYSIS_INTERVAL = 500; // 500ms for near real-time (2 FPS)
+const ML_API_URL = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
 
 export function CrowdCounter() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -28,7 +28,10 @@ export function CrowdCounter() {
     setCameraError(null);
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+        // Lower resolution for faster processing
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { width: 640, height: 480, frameRate: { ideal: 30 } } 
+        });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           setIsCameraOn(true);
@@ -43,6 +46,7 @@ export function CrowdCounter() {
     }
   };
 
+  // Direct API call for faster response (bypasses server action overhead)
   const handleAnalyze = async () => {
     if (isPending || !videoRef.current || !canvasRef.current) return;
     
@@ -53,20 +57,43 @@ export function CrowdCounter() {
       return;
     }
     
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Use smaller canvas for faster encoding/transmission
+    canvas.width = 320;
+    canvas.height = 240;
     const context = canvas.getContext('2d');
     if (!context) return;
 
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg');
-
-    const formData = new FormData();
-    formData.append('photoDataUri', dataUrl);
+    // Lower quality JPEG for faster transmission
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
 
     setIsPending(true);
-    const response = await getCrowdCount(resultState, formData);
-    setResultState(response);
+    
+    try {
+      // Direct call to ML API for minimal latency
+      const response = await fetch(`${ML_API_URL}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoDataUri: dataUrl, area_sqm: 10.0 }),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setResultState({
+          message: 'Analysis successful.',
+          data: {
+            crowdCount: result.crowdCount,
+            riskLevel: result.riskLevel,
+            analysis: result.analysis,
+            densityPerSqm: result.densityPerSqm,
+            processingTimeMs: result.processingTimeMs,
+          }
+        });
+      }
+    } catch (error) {
+      console.error('ML API error:', error);
+    }
+    
     setIsPending(false);
   };
 
@@ -82,11 +109,12 @@ export function CrowdCounter() {
 
   useEffect(() => {
     if (isCameraOn) {
-      // Initial analysis after a short delay for camera to stabilize
+      // Start analysis immediately
       const initialTimeout = setTimeout(() => {
         handleAnalyze();
-      }, 1500);
+      }, 500);
 
+      // Continuous real-time analysis
       const intervalId = setInterval(() => {
         handleAnalyze();
       }, ANALYSIS_INTERVAL);
@@ -167,7 +195,7 @@ export function CrowdCounter() {
 }
 
 
-function AnalysisResults({ data }: { data: CountCrowdOutput }) {
+function AnalysisResults({ data }: { data: CrowdAnalysisResult }) {
     const riskColor = {
         Low: "text-green-600 bg-green-100 border-green-200 dark:bg-green-900/50 dark:border-green-700",
         Medium: "text-amber-600 bg-amber-100 border-amber-200 dark:bg-amber-900/50 dark:border-amber-700",
@@ -178,6 +206,11 @@ function AnalysisResults({ data }: { data: CountCrowdOutput }) {
             <div className="text-center">
                 <p className="text-sm text-muted-foreground">Estimated Crowd Count</p>
                 <p className="text-6xl font-bold">{data.crowdCount}</p>
+                {data.densityPerSqm !== undefined && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Density: {data.densityPerSqm} people/m²
+                    </p>
+                )}
             </div>
             <div className={`p-4 rounded-lg border ${riskColor[data.riskLevel]}`}>
                 <h4 className="font-semibold flex items-center gap-2"><AlertTriangle/> Risk Level: {data.riskLevel}</h4>
@@ -186,6 +219,11 @@ function AnalysisResults({ data }: { data: CountCrowdOutput }) {
                 <h4 className="font-semibold mb-2">Analysis</h4>
                 <p className="text-sm text-muted-foreground bg-muted p-4 rounded-md">{data.analysis}</p>
             </div>
+            {data.processingTimeMs !== undefined && (
+                <p className="text-xs text-center text-muted-foreground">
+                    Processed in {data.processingTimeMs}ms using local ML models
+                </p>
+            )}
         </CardContent>
     )
 }
