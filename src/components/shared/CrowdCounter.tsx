@@ -13,8 +13,9 @@ const initialState: ResultState = {
   data: null,
 };
 
-const ANALYSIS_INTERVAL = 500; // 500ms for near real-time (2 FPS)
+const ANALYSIS_INTERVAL = 800; // 800ms for stable results
 const ML_API_URL = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:8000';
+const SMOOTHING_WINDOW = 5; // Number of readings to average
 
 export function CrowdCounter() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -23,6 +24,7 @@ export function CrowdCounter() {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [resultState, setResultState] = useState<ResultState>(initialState);
+  const recentCountsRef = useRef<number[]>([]); // For temporal smoothing
 
   const startCamera = async () => {
     setCameraError(null);
@@ -57,9 +59,9 @@ export function CrowdCounter() {
       return;
     }
     
-    // Use smaller canvas for faster encoding/transmission
-    canvas.width = 320;
-    canvas.height = 240;
+    // Use medium resolution for better detection accuracy
+    canvas.width = 480;
+    canvas.height = 360;
     const context = canvas.getContext('2d');
     if (!context) return;
 
@@ -79,13 +81,33 @@ export function CrowdCounter() {
       
       if (response.ok) {
         const result = await response.json();
+        
+        // Apply temporal smoothing to reduce fluctuations
+        recentCountsRef.current.push(result.crowdCount);
+        if (recentCountsRef.current.length > SMOOTHING_WINDOW) {
+          recentCountsRef.current.shift();
+        }
+        
+        // Calculate smoothed count (weighted average - recent values matter more)
+        const weights = recentCountsRef.current.map((_, i) => i + 1);
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        const smoothedCount = Math.round(
+          recentCountsRef.current.reduce((sum, count, i) => sum + count * weights[i], 0) / totalWeight
+        );
+        
+        // Recalculate risk level based on smoothed count
+        const smoothedDensity = smoothedCount / 10.0; // Use area from request
+        let smoothedRiskLevel: 'Low' | 'Medium' | 'High' = 'Low';
+        if (smoothedDensity >= 3.0) smoothedRiskLevel = 'High';
+        else if (smoothedDensity >= 1.5) smoothedRiskLevel = 'Medium';
+        
         setResultState({
           message: 'Analysis successful.',
           data: {
-            crowdCount: result.crowdCount,
-            riskLevel: result.riskLevel,
+            crowdCount: smoothedCount,
+            riskLevel: smoothedRiskLevel,
             analysis: result.analysis,
-            densityPerSqm: result.densityPerSqm,
+            densityPerSqm: smoothedDensity,
             processingTimeMs: result.processingTimeMs,
           }
         });

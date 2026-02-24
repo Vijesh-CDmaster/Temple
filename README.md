@@ -49,3 +49,4 @@ To run this project on your local desktop using Visual Studio Code, follow these
         Keep this terminal running alongside the main app. The Genkit development UI will be available at [http://localhost:4000](http://localhost:4000).
 
 That's it! You should now have the full application running on your local machine.
+pip install ultralytics

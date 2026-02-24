@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from "./_components/sidebar";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminContext';
@@ -12,19 +12,26 @@ function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicRoute = pathname === '/admin/login' || pathname === '/admin/register';
+  // Memoize public route check to avoid recalculation
+  const isPublicRoute = useMemo(() => 
+    pathname === '/admin/login' || pathname === '/admin/register',
+    [pathname]
+  );
 
+  // Single redirect effect - only runs when auth state truly changes
   useEffect(() => {
     if (isInitialized && !currentAdmin && !isPublicRoute) {
-      router.push('/admin/login');
+      router.replace('/admin/login');
     }
   }, [currentAdmin, isInitialized, router, isPublicRoute]);
   
+  // Public routes render immediately without sidebar
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  if (!isInitialized || !currentAdmin) {
+  // Show skeleton only during initial auth check
+  if (!isInitialized) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center w-full">
         <div className="w-full flex">
@@ -44,6 +51,11 @@ function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
+  }
+
+  // If initialized but no admin, just render null while redirecting
+  if (!currentAdmin) {
+    return null;
   }
 
   return (

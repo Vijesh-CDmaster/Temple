@@ -8,8 +8,6 @@ import { Briefcase, LayoutDashboard, ListChecks, Users, Siren, Map, Menu, Home, 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useWorkerAuth } from "@/context/WorkerContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const allNavLinks = [
@@ -28,22 +26,15 @@ const allNavLinks = [
 
 export function WorkerSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { currentWorker, logout } = useWorkerAuth();
 
-  useEffect(() => {
-    if (!currentWorker) {
-      router.push("/worker");
-    }
-  }, [currentWorker, router]);
-
+  // Early return if no worker - layout handles the loading/redirect
   if (!currentWorker) {
-    return null; // Don't render anything if there's no worker, while redirecting.
+    return null;
   }
 
   const handleLogout = () => {
     logout();
-    router.push("/worker");
   };
 
   const hasAccess = (allowedGroups: string[]) => {

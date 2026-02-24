@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { PilgrimHeader } from "@/components/shared/PilgrimHeader";
 import { SosButton } from "@/components/shared/SosButton";
@@ -27,6 +27,11 @@ export default function DashboardLayout({
 }) {
   const { currentUser, isInitialized } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isInitialized && !currentUser) {
@@ -34,20 +39,16 @@ export default function DashboardLayout({
     }
   }, [currentUser, isInitialized, router]);
 
-  // Memoize the content to prevent unnecessary re-renders
-  const content = useMemo(() => {
-    if (!isInitialized || !currentUser) {
-      return <LoadingSkeleton />;
-    }
+  // Always show loading on server and initial client render to prevent hydration mismatch
+  if (!mounted || !isInitialized || !currentUser) {
+    return <LoadingSkeleton />;
+  }
 
-    return (
-      <div className="relative flex min-h-dvh flex-col">
-        <PilgrimHeader />
-        <main className="flex-1">{children}</main>
-        <SosButton />
-      </div>
-    );
-  }, [isInitialized, currentUser, children]);
-
-  return content;
+  return (
+    <div className="relative flex min-h-dvh flex-col">
+      <PilgrimHeader />
+      <main className="flex-1">{children}</main>
+      <SosButton />
+    </div>
+  );
 }

@@ -80,17 +80,17 @@ def get_csrnet_engine():
 
 
 def get_yolo_detector():
-    """Lazy load YOLO detector optimized for speed."""
+    """Lazy load YOLO detector optimized for stability."""
     global _yolo_detector
     if _yolo_detector is None:
         try:
             from .yolo_detector import YOLOv8Detector, YOLO_AVAILABLE
             if YOLO_AVAILABLE:
                 _yolo_detector = YOLOv8Detector(
-                    model_size="n",  # Nano model for maximum speed
-                    confidence_threshold=0.3  # Balance between speed and accuracy
+                    model_size="s",  # Small model for better accuracy (stable detection)
+                    confidence_threshold=0.5  # Higher threshold reduces fluctuations
                 )
-                print("YOLO detector loaded successfully (nano model for real-time)")
+                print("YOLO detector loaded successfully (small model for stable detection)")
             else:
                 print("YOLO not available (ultralytics not installed)")
                 _yolo_detector = "unavailable"

@@ -158,8 +158,9 @@ class CSRNet(nn.Module):
         # Backend: Dilated convolutions (maintains spatial size)
         density_features = self.backend(features)
         
-        # Output: Generate density map
+        # Output: Generate density map (ReLU ensures non-negative values)
         density_map = self.output_layer(density_features)
+        density_map = torch.relu(density_map)
         
         return density_map
     
@@ -245,7 +246,8 @@ class CSRNetLite(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         features = self.frontend(x)
         density_features = self.backend(features)
-        return self.output_layer(density_features)
+        density_map = self.output_layer(density_features)
+        return torch.relu(density_map)
     
     def count(self, density_map: torch.Tensor) -> torch.Tensor:
         return density_map.sum(dim=(1, 2, 3))

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { WorkerSidebar } from "./dashboard/_components/sidebar";
 import { WorkerAuthProvider, useWorkerAuth } from "@/context/WorkerContext";
@@ -12,36 +12,48 @@ function WorkerProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicRoute = pathname === '/worker' || pathname === '/worker/register';
+  // Memoize public route check to avoid recalculation
+  const isPublicRoute = useMemo(() => 
+    pathname === '/worker' || pathname === '/worker/register',
+    [pathname]
+  );
 
+  // Single redirect effect - only runs when auth state truly changes
   useEffect(() => {
     if (isInitialized && !currentWorker && !isPublicRoute) {
-      router.push('/worker');
+      router.replace('/worker');
     }
   }, [currentWorker, isInitialized, router, isPublicRoute]);
 
+  // Public routes render immediately without sidebar
   if (isPublicRoute) {
-      return <>{children}</>;
+    return <>{children}</>;
   }
-  
-  if (!isInitialized || !currentWorker) {
-      return (
-        <div className="flex min-h-dvh w-full">
-            <div className="hidden md:flex w-64">
-                <div className="p-4 space-y-2 w-full">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-                </div>
-            </div>
-            <div className="flex-1 p-8 space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-64 w-full" />
-                <Skeleton className="h-32 w-full" />
-            </div>
+
+  // Show skeleton only during initial auth check
+  if (!isInitialized) {
+    return (
+      <div className="flex min-h-dvh w-full">
+        <div className="hidden md:flex w-64">
+          <div className="p-4 space-y-2 w-full">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+          </div>
         </div>
+        <div className="flex-1 p-8 space-y-4">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </div>
     );
+  }
+
+  // If initialized but no worker, just render null while redirecting
+  if (!currentWorker) {
+    return null;
   }
 
   return (
